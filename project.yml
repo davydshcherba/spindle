@@ -1,0 +1,65 @@
+name: Spindle
+options:
+  bundleIdPrefix: com.spindle
+  deploymentTarget:
+    macOS: "15.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    # Xcode 26 defaults for new app projects: everything is @MainActor unless
+    # opted out, and nonisolated async functions stay on the caller's actor.
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    SWIFT_APPROACHABLE_CONCURRENCY: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+    DEAD_CODE_STRIPPING: YES
+
+targets:
+  Spindle:
+    type: application
+    platform: macOS
+    sources:
+      - path: Spindle
+    settings:
+      base:
+        PRODUCT_NAME: Spindle
+        PRODUCT_BUNDLE_IDENTIFIER: com.spindle.Spindle
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Spindle
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.music
+        CODE_SIGN_ENTITLEMENTS: Config/Spindle.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_HARDENED_RUNTIME: YES
+        COMBINE_HIDPI_IMAGES: YES
+
+  SpindleTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: SpindleTests
+    dependencies:
+      - target: Spindle
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.spindle.SpindleTests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Spindle:
+    build:
+      targets:
+        Spindle: all
+        SpindleTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SpindleTests
