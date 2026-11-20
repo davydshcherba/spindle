@@ -1,72 +1,176 @@
+<div align="center">
+
+<img src="Spindle/Assets.xcassets/AppIcon.appiconset/icon_512.png" width="120" alt="Spindle app icon">
+
 # Spindle
 
-A minimal, customizable music player for your own files — macOS &amp; iOS. Built with SwiftUI.
+**A minimal music player for your own files.**<br>
+mp3 · m4a · flac · wav — no accounts, no streaming, no tracking.
 
-This repository contains the macOS MVP: import local **mp3, m4a, flac and wav** files, browse them as albums or a
-list, build playlists, and play them with media-key and Control Center support. No accounts, no streaming, no
-third-party dependencies.
+<img alt="macOS 15+" src="https://img.shields.io/badge/macOS-15%2B-1f2937?logo=apple&logoColor=white">
+<img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
+<img alt="SwiftUI" src="https://img.shields.io/badge/UI-SwiftUI-0A84FF">
+<img alt="Dependencies: 0" src="https://img.shields.io/badge/dependencies-0-637545">
+<img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-lightgrey">
 
-## Requirements
+<br><br>
 
-- macOS 15+, Xcode 26 (Swift 6 language mode)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) — only to regenerate `Spindle.xcodeproj` from `project.yml`
-  (`brew install xcodegen`). The generated project is checked in, so you can also just open it.
+<img src="docs/screenshots/library-grid.png" alt="Spindle: the album grid with the player bar" width="900">
 
-## Build, run, test
+</div>
+
+## Why Spindle
+
+Streaming apps are great — until the music you love isn't on them: old rips, bootlegs, your own recordings, things you
+bought. Spindle is a calm, fast player for exactly that. Point it at a folder and listen.
+
+> **Status:** early MVP (v0.1). The Mac app is usable day to day; the iPhone app is next. Rough edges are expected —
+> issues and ideas are welcome.
+
+## What it does
+
+- **Bring your music in** — pick files or whole folders, or drag them onto the window. Tags and embedded cover art are
+  read automatically (ID3, iTunes/M4A and FLAC/Vorbis), duplicates can be skipped, and a live progress view shows the
+  import while you keep listening.
+- **Remembers your library** — files stay where they are; Spindle keeps security-scoped bookmarks, so it never asks
+  for access again after a relaunch.
+- **Browse your way** — an album grid or a track list, with *All / Albums / Artists / Recently added* filters, sorting
+  and instant search.
+- **Playlists** — create, rename, delete, give them your own cover. Add songs from a hover button or the right-click
+  menu.
+- **A player on every page** — play/pause, previous/next, shuffle, repeat, seek, volume. Media keys and Control Center
+  work too.
+- **Now Playing** — a full page with a large cover and a background tinted by the cover's dominant colour, plus a play
+  queue (play next, add to queue, jump, remove).
+- **Edit anything** — songs, albums and playlists, including cover pictures. Rename an album to merge it with another,
+  or put every song into one album. Your files are never modified.
+- **Mac-native** — a *Playback* menu with Space, ⌘← and ⌘→, a single window, a dark theme with a deliberate palette
+  (`#222831` · `#37353E` · `#637545`).
+
+## A look around
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/now-playing.png" alt="Now Playing"><br><sub><b>Now Playing</b> — the background follows the cover</sub></td>
+    <td width="50%"><img src="docs/screenshots/queue.png" alt="Play queue"><br><sub><b>Queue</b> — what's up next</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/playlists.png" alt="Playlists"><br><sub><b>Playlists</b> — automatic cover mosaics, or your own picture</sub></td>
+    <td><img src="docs/screenshots/playlist.png" alt="A playlist"><br><sub><b>Playlist</b> — play, shuffle, remove songs</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/library-list.png" alt="Library as a list"><br><sub><b>List view</b> — hover for “add to playlist”</sub></td>
+    <td><img src="docs/screenshots/add-music.png" alt="Add music dialog"><br><sub><b>Add music</b> — files, folders or drag and drop</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/edit-song.png" alt="Edit a song"><br><sub><b>Edit a song</b> — tags and cover</sub></td>
+    <td><img src="docs/screenshots/edit-album.png" alt="Edit an album"><br><sub><b>Edit an album</b> — name, artist, year, cover</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/empty-state.png" alt="First launch"><br><sub><b>First launch</b></sub></td>
+    <td><img src="docs/screenshots/edit-playlist.png" alt="Edit a playlist"><br><sub><b>Edit a playlist</b> — name and cover</sub></td>
+  </tr>
+</table>
+
+The designs this follows live in [`docs/design.pdf`](docs/design.pdf).
+
+## Get it running
+
+**Requirements:** macOS 15+ and Xcode 26 (Swift 6). [XcodeGen](https://github.com/yonaskolb/XcodeGen) is only needed
+to regenerate the Xcode project from `project.yml` (`brew install xcodegen`); the generated project is checked in.
 
 ```sh
-xcodegen generate                      # only after adding/removing files or editing project.yml
-open Spindle.xcodeproj                 # ⌘R to run, ⌘U to test
-xcodebuild -scheme Spindle -destination 'platform=macOS' test
+git clone https://github.com/davydshcherba/spindle.git
+cd spindle
+open Spindle.xcodeproj          # then press ⌘R
 ```
 
-The app is signed ad hoc ("Sign to Run Locally"); set a development team in Xcode to run it on other Macs.
+### Build a standalone app
 
-## How it works
+```sh
+xcodebuild -project Spindle.xcodeproj -scheme Spindle -configuration Release \
+  -destination 'platform=macOS' -derivedDataPath .build build
+ditto .build/Build/Products/Release/Spindle.app ~/Applications/Spindle.app
+```
+
+You get a universal (Apple Silicon + Intel) `Spindle.app` of about 8 MB. It is signed ad hoc, so it runs on the Mac
+that built it. To hand it to other people you'd need an Apple Developer ID and notarization.
+
+### Where do my songs live?
+
+Spindle never copies or moves your music. The library (titles, artists, bookmarks to the files) and a small cover-art
+cache live in the app's sandbox container, `~/Library/Containers/com.spindle.Spindle/`. If a file is deleted, Spindle
+tells you and skips it; removing a song from Spindle never deletes the file.
+
+## Editing without touching your files
+
+Spindle has **read-only** access to the files you give it, by design. Edits to songs, albums and playlists are
+stored in Spindle's own library, so a wrong edit can always be undone and your tags stay exactly as they were.
+
+| Right-click… | …to change |
+| --- | --- |
+| a song → **Edit Info…** | title, artist, album, album artist, year, track number, cover |
+| an album → **Edit Album…** | name, album artist, year, cover — for every song in it |
+| a playlist → **Edit…** | name and cover picture |
+
+Albums are simply “songs with the same name and album artist”, so renaming an album to match another merges them.
+Prefer one big album? **Settings → Put all songs in one album…** moves everything into “My songs”, and a switch in
+the Add music dialog does the same for future imports.
+
+## Under the hood
+
+No third-party dependencies — only Apple frameworks: SwiftUI, SwiftData, AVFoundation, MediaPlayer, CryptoKit.
 
 ```
 Spindle/
-  Models/       Track, Playlist (SwiftData) · Album/ArtistGroup (derived) · PlayerItem (store-free snapshot)
-  Services/     LibraryService   import files/folders, tags + artwork (AVFoundation / FLAC parser), playlists
-                PlayerService    AVPlayer, queue, next/previous, seek, shuffle, repeat, volume
-                NowPlayingService  MPNowPlayingInfoCenter + MPRemoteCommandCenter (media keys, Control Center)
-                ArtworkStore, SecurityScopedBookmark, DominantColor, …
+  Models/       Track, Playlist (SwiftData) · derived Album/ArtistGroup · store-free PlayerItem
+  Services/     LibraryService   import, tags and artwork, playlists, editing
+                PlayerService    AVPlayer queue, next/previous, seek, shuffle, repeat, volume
+                NowPlayingService  media keys and Control Center
+                ArtworkStore, CoverImporter, SecurityScopedBookmark, DominantColor, …
   ViewModels/   @Observable view models — all UI logic lives here
-  Views/        SwiftUI views — layout only, no business logic
-  Platform/     the only AppKit: NSOpenPanel behind a `FilePicking` protocol
-  App/          composition root (AppEnvironment / AppModel) and the app entry point
+  Views/        SwiftUI views — layout only
+  Platform/     the only AppKit: file pickers behind a small protocol
+  App/          composition root and the app entry point
 ```
 
-Models, services and view models have no unconditional AppKit dependency (the one platform image conversion in
-`NowPlayingService` sits behind `#if canImport(AppKit)` / `UIKit`), so they can be reused for an iOS target; only
-`Platform/` and the window chrome in `Views/` are macOS-specific.
+- **Ready for iPhone.** Models, services and view models have no unconditional AppKit dependency, so the same code can
+  back an iOS app. Only `Platform/` and the window chrome are Mac-specific.
+- **Swift 6, strict concurrency**, with main-actor isolation by default; tag reading and artwork encoding run off the
+  main thread.
+- **Playlists store an ordered list of track ids**, because SwiftData doesn't guarantee the order of relationships.
+- **FLAC tags are parsed directly** from the file's metadata blocks instead of relying on system support.
+- **Sandboxed**, with user-selected read-only file access and app-scoped bookmarks
+  (see [`Config/Spindle.entitlements`](Config/Spindle.entitlements)).
 
-### Sandbox and "remember my library"
+## Tests
 
-The app is sandboxed with user-selected **read-only** file access plus the app-scope **bookmarks** entitlement
-(`Config/Spindle.entitlements`). Every imported file gets a security-scoped bookmark stored on its `Track`, so the
-library loads on the next launch and plays without asking again. Bookmarks are resolved lazily when a track is played,
-and refreshed if the system reports them stale.
+```sh
+xcodebuild -scheme Spindle -destination 'platform=macOS' test
+```
 
-### Debug launch options
+104 [Swift Testing](https://developer.apple.com/documentation/testing) tests cover importing, tag reading, playback,
+queue behaviour, playlists, editing and the view models. Audio fixtures (MP3, M4A, FLAC with tags and cover art) are
+generated in code, so the repo ships no binary test files.
 
-Debug builds only (compiled out of Release): set `SPINDLE_SEED_DIR` to import a folder on launch and
-`SPINDLE_SCREEN` (e.g. `list,play`, `nowplaying`, `queue`, `add`) to start on a given screen. See
-`Spindle/App/DebugLaunch.swift`. The sandboxed app can only read the seed folder if it lives inside its container.
+Debug builds also understand a few launch variables for setting up a screen quickly — see
+[`DebugLaunch.swift`](Spindle/App/DebugLaunch.swift). They are compiled out of Release builds.
 
-## Not in the MVP
+## Roadmap
 
-The turntable "vinyl" Now Playing variant from the design, light theme, gapless playback, and iOS UI.
+Ideas, not promises:
 
-You can edit, from the right-click menus:
+- [ ] iPhone app, reusing the models, services and view models
+- [ ] The turntable “vinyl” Now Playing from the design
+- [ ] Gapless playback
+- [ ] Light theme
+- [ ] Optionally write edited tags back into the files (needs read-write access)
 
-- **a song** (**Edit Info…**): title, artist, album, album artist, year, track number and its cover picture;
-- **an album** (**Edit Album…**): name, album artist, year and a cover picture, for every song in it. Albums with the
-  same name and album artist are one album, so renaming an album to match another merges them;
-- **a playlist** (**Edit…**): name and a cover picture (otherwise the cover is a mosaic of its songs).
+## Built in public
 
-Edits are stored in Spindle's library only: the app has read-only access to your files, so tags inside the files are
-never rewritten. A picture you choose is copied into Spindle's own cache.
+Spindle is built in public by [Davyd](https://github.com/davydshcherba) from Ukraine 🇺🇦 — wins, fails and real
+numbers. Watch the repo or open an issue to follow along or say hi.
 
-To get one album for everything instead of one album per song, use **Settings → Put all songs in one album…**
-(existing songs) or the **Put new songs in "My songs"** switch in the Add music dialog (future imports).
+## License
+
+[MIT](LICENSE) © Davyd Shcherba
