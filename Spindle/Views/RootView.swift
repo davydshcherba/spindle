@@ -10,6 +10,7 @@ struct RootView: View {
     @Environment(PlaylistsViewModel.self) private var playlists
     @Environment(ToastCenter.self) private var toasts
     @Environment(CoverImporter.self) private var covers
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         @Bindable var app = app
@@ -29,12 +30,14 @@ struct RootView: View {
                 .blur(radius: app.isAddMusicPresented ? 10 : 0)
 
             if app.isAddMusicPresented {
-                AddMusicView().transition(.opacity)
+                // A modal: fades in from a touch smaller. (Reduced motion: just the fade.)
+                AddMusicView()
+                    .transition(reduceMotion ? .opacity : AnyTransition.opacity.combined(with: .scale(scale: 0.97)))
             }
 
             if app.isNowPlayingPresented {
                 NowPlayingView()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(reduceMotion ? .opacity : AnyTransition.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(2)
             }
 
@@ -44,7 +47,7 @@ struct RootView: View {
             if let message = toasts.message {
                 ToastView(message: message)
                     .padding(.bottom, app.isNowPlayingPresented ? 110 : 112)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(reduceMotion ? .opacity : AnyTransition.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(3)
             }
         }

@@ -1,10 +1,14 @@
 import SwiftUI
 
+/// Press feedback: the control dips slightly while held. Skipped for reduced motion.
 struct PressScaleButtonStyle: ButtonStyle {
+    var scale: CGFloat = 0.94
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.94 : 1)
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? scale : 1)
+            .animation(Motion.out(0.12), value: configuration.isPressed)
     }
 }
 
@@ -27,11 +31,14 @@ struct PlayPauseButton: View {
     }
 
     @ViewBuilder private var symbol: some View {
+        // The glyph morphs between play and pause instead of swapping.
         let image = Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+            .contentTransition(.symbolEffect(.replace))
             .font(.system(size: size * 0.38, weight: .bold))
             .foregroundStyle(.white)
             .offset(x: player.isPlaying ? 0 : size * 0.02)
             .frame(width: size, height: size)
+            .animation(Motion.quick, value: player.isPlaying)
         if glass {
             image.accentGlass(in: Circle())
         } else {

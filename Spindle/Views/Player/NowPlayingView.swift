@@ -114,23 +114,31 @@ struct NowPlayingView: View {
     }
 
     private func cover(side: CGFloat) -> some View {
-        ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 1024, cornerRadius: 28)
-            .frame(width: side, height: side)
-            .shadow(color: .black.opacity(0.45), radius: 36, y: 20)
-            .scaleEffect(player.isPlaying ? 1 : 0.93)
-            .animation(.spring(duration: 0.5, bounce: 0.25), value: player.isPlaying)
+        // A new cover settles in over the old one when the track changes.
+        Swap(id: player.currentItem?.artworkKey, style: .cover) {
+            ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 1024, cornerRadius: 28)
+                .frame(width: side, height: side)
+                .shadow(color: .black.opacity(0.45), radius: 36, y: 20)
+        }
+        .scaleEffect(player.isPlaying ? 1 : 0.93)
+        .animation(.spring(duration: 0.5, bounce: 0.25), value: player.isPlaying)
     }
 
     private var info: some View {
+        // Title first, artist a beat later.
         VStack(spacing: 6) {
-            Text(player.currentItem?.title ?? "")
-                .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(Theme.text)
-                .lineLimit(1)
-            Text(player.subtitle)
-                .font(.system(size: 17))
-                .foregroundStyle(Theme.text.opacity(0.65))
-                .lineLimit(1)
+            Swap(id: player.currentItem?.id) {
+                Text(player.currentItem?.title ?? "")
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundStyle(Theme.text)
+                    .lineLimit(1)
+            }
+            Swap(id: player.currentItem?.id, delay: 0.04) {
+                Text(player.subtitle)
+                    .font(.system(size: 17))
+                    .foregroundStyle(Theme.text.opacity(0.65))
+                    .lineLimit(1)
+            }
         }
         .padding(.horizontal, 60)
         .multilineTextAlignment(.center)
@@ -148,6 +156,7 @@ struct NowPlayingView: View {
                 onChanged: { player.updateScrub($0) },
                 onEnded: { player.endScrub(at: $0) }
             )
+            .animation(Motion.swap, value: player.currentItem?.id)
             HStack {
                 Text(player.elapsedText)
                 Spacer()

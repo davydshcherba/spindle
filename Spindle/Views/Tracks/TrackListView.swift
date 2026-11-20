@@ -112,6 +112,9 @@ struct TrackRow: View {
             isHovering ? Color.white.opacity(0.09) : .clear,
             in: RoundedRectangle(cornerRadius: 14, style: .continuous)
         )
+        // Hover highlight and the current-track tint ease in and out.
+        .animation(Motion.quick, value: isHovering)
+        .animation(Motion.quick, value: isCurrent)
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
         .onTapGesture(count: 2) { play() }

@@ -13,18 +13,26 @@ struct ArtworkView: View {
 
     @Environment(\.artworkStore) private var store
     @State private var loaded: CGImage?
+    /// The key has no picture to show (not stored, or it couldn't be read).
+    @State private var isMissing = false
 
     var body: some View {
         let image = loaded ?? key.flatMap { store?.cachedImage(forKey: $0, maxPixelSize: pixelSize) }
         Color.clear
             .overlay {
-                if let image {
-                    Image(decorative: image, scale: 1)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    ArtworkPlaceholder()
+                // A cover that is still being decoded is blank rather than a placeholder, so it fades
+                // in once instead of flashing grey first. Already-cached covers show immediately.
+                ZStack {
+                    if let image {
+                        Image(decorative: image, scale: 1)
+                            .resizable()
+                            .scaledToFill()
+                            .transition(.opacity)
+                    } else if key == nil || isMissing {
+                        ArtworkPlaceholder()
+                    }
                 }
+                .animation(Motion.fade, value: image != nil)
             }
             .aspectRatio(1, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
@@ -33,8 +41,10 @@ struct ArtworkView: View {
     }
 
     private func load() async {
+        isMissing = false
         guard let key, let store else {
             loaded = nil
+            isMissing = true
             return
         }
         if store.cachedImage(forKey: key, maxPixelSize: pixelSize) != nil {
@@ -43,6 +53,7 @@ struct ArtworkView: View {
         }
         loaded = nil
         loaded = await store.loadImage(forKey: key, maxPixelSize: pixelSize)
+        isMissing = loaded == nil
     }
 }
 

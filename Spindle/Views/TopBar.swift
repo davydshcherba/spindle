@@ -95,6 +95,7 @@ struct TopBar: View {
                 .padding(.horizontal, 16)
                 .frame(height: Self.height - 12)
                 .background(isSelected ? Theme.accent : .clear, in: Capsule())
+                .animation(Motion.quick, value: isSelected)
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)

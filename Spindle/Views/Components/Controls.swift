@@ -22,7 +22,8 @@ struct IconButton: View {
             icon(side: side)
                 .contentShape(Circle())
         }
-        .buttonStyle(.plain)
+        // Interactive glass already responds to a press; plain icons get the dip.
+        .buttonStyle(PressScaleButtonStyle(scale: glass ? 1 : 0.9))
         .disabled(!isEnabled)
         .opacity(isEnabled ? 1 : 0.4)
         .onHover { hovering = $0 }
@@ -32,9 +33,15 @@ struct IconButton: View {
 
     @ViewBuilder private func icon(side: CGFloat) -> some View {
         let image = Image(systemName: systemName)
+            .contentTransition(.symbolEffect(.replace))
             .font(.system(size: size, weight: .medium))
             .foregroundStyle(hovering && isEnabled ? hoverColor : color)
             .frame(width: side, height: side)
+            // Hover, an on/off tint (shuffle, repeat) and a new glyph (repeat → repeat once,
+            // speaker levels) ease instead of snapping.
+            .animation(Motion.quick, value: hovering)
+            .animation(Motion.quick, value: color)
+            .animation(Motion.quick, value: systemName)
         if glass {
             image.glassEffect(.regular.interactive(), in: Circle())
         } else {
@@ -57,6 +64,7 @@ struct FilterChip: View {
                 .padding(.horizontal, 18)
                 .frame(height: 36)
                 .glassSelected(isSelected, in: Capsule())
+                .animation(Motion.quick, value: isSelected)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -84,6 +92,7 @@ struct LayoutToggle: View {
                 .foregroundStyle(isSelected ? Color.white : Theme.muted)
                 .frame(width: 42, height: 36)
                 .glassSelected(isSelected, in: Capsule())
+                .animation(Motion.quick, value: isSelected)
         }
         .buttonStyle(.plain)
         .help(help)

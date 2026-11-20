@@ -53,42 +53,48 @@ struct MenuBarPlayer: View {
     private var nowPlaying: some View {
         HStack(spacing: 12) {
             Button { openSpindle(showingNowPlaying: true) } label: {
-                ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 144, cornerRadius: 10)
-                    .frame(width: 68, height: 68)
+                // A new cover settles in over the old one when the track changes.
+                Swap(id: player.currentItem?.artworkKey, style: .cover) {
+                    ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 144, cornerRadius: 10)
+                }
+                .frame(width: 68, height: 68)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressScaleButtonStyle(scale: 0.96))
             .disabled(!player.hasItem)
             .help("Open Now Playing")
             .accessibilityLabel("Open Now Playing")
 
-            if let item = player.currentItem {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(item.title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Theme.text)
-                        .lineLimit(2)
-                    Text(item.artist)
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.muted)
-                        .lineLimit(1)
-                    Text(item.album)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.muted.opacity(0.8))
-                        .lineLimit(1)
+            // A fixed height keeps the popover from resizing when a title wraps onto two lines.
+            Group {
+                if let item = player.currentItem {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Swap(id: item.id, alignment: .leading) {
+                            Text(item.title)
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(Theme.text)
+                                .lineLimit(2)
+                        }
+                        Swap(id: item.id, alignment: .leading, delay: 0.04) {
+                            Text(item.artist)
+                                .font(.system(size: 13))
+                                .foregroundStyle(Theme.muted)
+                                .lineLimit(1)
+                        }
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Nothing playing")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Theme.text)
+                        Text("Pick a song in Spindle")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.muted)
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Nothing playing")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Theme.text)
-                    Text("Pick a song in Spindle")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.muted)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
+        .frame(height: 68)
     }
 
     // MARK: Progress and volume
@@ -103,6 +109,7 @@ struct MenuBarPlayer: View {
                 onChanged: { player.updateScrub($0) },
                 onEnded: { player.endScrub(at: $0) }
             )
+            .animation(Motion.swap, value: player.currentItem?.id)
             HStack {
                 Text(player.elapsedText)
                 Spacer()

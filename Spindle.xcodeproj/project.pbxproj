@@ -23,6 +23,7 @@
 		3244F84296B5C2707CFF295D /* TopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3B38E21D8D3284FB5012D97 /* TopBar.swift */; };
 		341CC8C13AD68F269A10C901 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1F66931C7A56D9994E78FF /* NowPlayingService.swift */; };
 		3493D8B14931EAF3FCD38516 /* DetailPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D274EA2608526E49B58071 /* DetailPages.swift */; };
+		3BC95ED4CBFB1A0946E98392 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5964520FDDC489B5F8D2B5 /* Motion.swift */; };
 		3F482ED44979193E1F65A61C /* SecurityScopedBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8DD5CB65E63963097479A9 /* SecurityScopedBookmark.swift */; };
 		40C2730DEAC44A772D82FA1F /* MetadataReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7367DA2EB95FCDDE76894460 /* MetadataReaderTests.swift */; };
 		4180916B33C7F2C2FF58F731 /* ArtworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6203135406ECD08E27854C4 /* ArtworkView.swift */; };
@@ -126,6 +127,7 @@
 		985BF6F4211619E1F7D5175E /* ImportSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSession.swift; sourceTree = "<group>"; };
 		99A3AA047F80AEE11C725ED9 /* ToastCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCenter.swift; sourceTree = "<group>"; };
 		9A6AF5F11C3D6CA6CDEED170 /* PlaylistEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditorSheet.swift; sourceTree = "<group>"; };
+		9D5964520FDDC489B5F8D2B5 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		A0785420FDCE4D80B3F2B8C3 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		A3B38E21D8D3284FB5012D97 /* TopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBar.swift; sourceTree = "<group>"; };
 		A41F229AA9DACDCD36572FB0 /* LibraryHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryHarness.swift; sourceTree = "<group>"; };
@@ -275,6 +277,7 @@
 				E6203135406ECD08E27854C4 /* ArtworkView.swift */,
 				3BB11D4E5613EF37960B0293 /* Controls.swift */,
 				972FB208C35CCAE11B4331E0 /* CoverEditor.swift */,
+				9D5964520FDDC489B5F8D2B5 /* Motion.swift */,
 				2A8FC335DB45695DA1298637 /* SeekBar.swift */,
 				F3ACB5397BE156CDDF5C6C97 /* VinylDisc.swift */,
 			);
@@ -529,6 +532,7 @@
 				925E4F79941574295B191918 /* MenuBarPlayer.swift in Sources */,
 				B7377400C5AF7F1D7013E966 /* MetadataReader.swift in Sources */,
 				266D122F3D910E1961C1DC53 /* MissingItemView.swift in Sources */,
+				3BC95ED4CBFB1A0946E98392 /* Motion.swift in Sources */,
 				8FF7EC64C3C11649AEF08677 /* MyMusicView.swift in Sources */,
 				341CC8C13AD68F269A10C901 /* NowPlayingService.swift in Sources */,
 				542D92A924B090F52B27C8F1 /* NowPlayingView.swift in Sources */,

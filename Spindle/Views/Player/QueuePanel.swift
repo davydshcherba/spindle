@@ -16,7 +16,7 @@ struct QueuePanel: View {
                     LazyVStack(alignment: .leading, spacing: 2) {
                         sectionTitle("Now playing")
                         if let current = player.currentEntry {
-                            QueueRow(entry: current, isCurrent: true)
+                            Swap(id: current.id) { QueueRow(entry: current, isCurrent: true) }
                         }
 
                         sectionTitle("Next up").padding(.top, 14)
@@ -27,9 +27,11 @@ struct QueuePanel: View {
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 8)
                         } else {
-                            ForEach(player.upNext) { QueueRow(entry: $0, isCurrent: false) }
+                            ForEach(player.upNext) { QueueRow(entry: $0, isCurrent: false).transition(.opacity) }
                         }
                     }
+                    // Removing or skipping past a song fades its row out and closes the gap.
+                    .animation(Motion.swap, value: player.upNext.map(\.id))
                     .padding(.horizontal, 10)
                     .padding(.bottom, 20)
                 }
@@ -120,6 +122,7 @@ private struct QueueRow: View {
             isHovering && !isCurrent ? Color.white.opacity(0.07) : .clear,
             in: RoundedRectangle(cornerRadius: 10, style: .continuous)
         )
+        .animation(Motion.quick, value: isHovering)
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
         .onTapGesture { if !isCurrent { player.jump(to: entry) } }

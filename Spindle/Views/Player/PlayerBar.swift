@@ -24,8 +24,11 @@ struct PlayerBar: View {
     private var nowPlaying: some View {
         HStack(spacing: 14) {
             Button { app.presentNowPlaying() } label: {
-                ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 128, cornerRadius: 12)
-                    .frame(width: 56, height: 56)
+                // A new cover settles in over the old one when the track changes.
+                Swap(id: player.currentItem?.artworkKey, style: .cover) {
+                    ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 128, cornerRadius: 12)
+                }
+                .frame(width: 56, height: 56)
             }
             .buttonStyle(.plain)
             .disabled(!player.hasItem)
@@ -33,15 +36,20 @@ struct PlayerBar: View {
             .accessibilityLabel("Open Now Playing")
 
             if let item = player.currentItem {
+                // Title first, artist a beat later.
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(item.title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Theme.text)
-                        .lineLimit(1)
-                    Text(item.artist)
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.muted)
-                        .lineLimit(1)
+                    Swap(id: item.id, alignment: .leading) {
+                        Text(item.title)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Theme.text)
+                            .lineLimit(1)
+                    }
+                    Swap(id: item.id, alignment: .leading, delay: 0.04) {
+                        Text(item.artist)
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.muted)
+                            .lineLimit(1)
+                    }
                 }
             } else {
                 Text("Nothing playing")
@@ -68,6 +76,8 @@ struct PlayerBar: View {
                     onChanged: { player.updateScrub($0) },
                     onEnded: { player.endScrub(at: $0) }
                 )
+                // The bar sweeps back to the start on a new track instead of jumping.
+                .animation(Motion.swap, value: player.currentItem?.id)
                 Text(player.durationText)
                     .frame(width: 44, alignment: .leading)
             }
