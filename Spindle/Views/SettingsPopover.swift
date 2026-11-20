@@ -51,7 +51,6 @@ struct SettingsPopover: View {
         }
         .padding(18)
         .frame(width: 280, alignment: .leading)
-        .background(Theme.surface)
         .confirmationDialog(
             "Put all songs in \u{201C}\(LibraryDefaults.songsAlbum)\u{201D}?",
             isPresented: $isConfirmingOneAlbum, titleVisibility: .visible

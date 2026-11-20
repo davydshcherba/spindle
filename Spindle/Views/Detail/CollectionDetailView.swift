@@ -86,7 +86,7 @@ struct CollectionDetailView<Cover: View, MoreMenu: View>: View {
             } label: {
                 Label("Play", systemImage: "play.fill")
             }
-            .buttonStyle(AccentButtonStyle(height: 48, cornerRadius: 24))
+            .buttonStyle(AccentButtonStyle(height: 48))
 
             Button {
                 player.play(tracks, context: context, shuffled: true)
@@ -102,7 +102,8 @@ struct CollectionDetailView<Cover: View, MoreMenu: View>: View {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Theme.text)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 48, height: 48)
+                    .glassEffect(.regular.interactive(), in: Circle())
                     .contentShape(Circle())
             }
             .menuStyle(.button)

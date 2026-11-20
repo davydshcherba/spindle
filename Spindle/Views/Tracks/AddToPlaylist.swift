@@ -53,7 +53,6 @@ struct AddToPlaylistPopover: View {
         }
         .padding(12)
         .frame(width: 290)
-        .background(Theme.surface)
     }
 
     private func row(_ summary: PlaylistsViewModel.Summary) -> some View {

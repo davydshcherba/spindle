@@ -36,9 +36,10 @@ struct QueuePanel: View {
             }
             .frame(width: Self.width)
             .frame(maxHeight: .infinity)
-            .background(.ultraThinMaterial)
-            .background(Theme.surface.opacity(0.7))
-            .overlay(alignment: .leading) { Rectangle().fill(Theme.hairline).frame(width: 1) }
+            // A floating Liquid Glass panel rather than a full-height strip.
+            .glassPanel(cornerRadius: 32)
+            .padding(.trailing, 16)
+            .padding(.vertical, 16)
         }
     }
 
@@ -57,9 +58,9 @@ struct QueuePanel: View {
             Spacer()
             IconButton(systemName: "xmark", size: 13, help: "Close queue") { app.isQueueVisible = false }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 62)
-        .padding(.bottom, 14)
+        .padding(.horizontal, 22)
+        .padding(.top, 22)
+        .padding(.bottom, 12)
     }
 
     private func sectionTitle(_ text: String) -> some View {

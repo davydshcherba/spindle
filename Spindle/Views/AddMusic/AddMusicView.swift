@@ -20,9 +20,8 @@ struct AddMusicView: View {
             }
             .padding(28)
             .frame(width: 700)
-            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Theme.hairline))
-            .shadow(color: .black.opacity(0.5), radius: 40, y: 18)
+            .glassPanel(cornerRadius: 36)
+            .shadow(color: .black.opacity(0.35), radius: 40, y: 18)
         }
         .onExitCommand { importer.close() }
         .accessibilityAddTraits(.isModal)
@@ -61,14 +60,14 @@ struct AddMusicView: View {
                 } label: {
                     Label("Choose files", systemImage: "doc")
                 }
-                .buttonStyle(OutlineSquareButtonStyle())
+                .buttonStyle(OutlineButtonStyle(height: 40))
 
                 Button {
                     Task { await importer.chooseFolder() }
                 } label: {
                     Label("Choose folder", systemImage: "folder")
                 }
-                .buttonStyle(AccentButtonStyle(height: 40, cornerRadius: 9))
+                .buttonStyle(AccentButtonStyle(height: 40))
             }
         }
         .frame(maxWidth: .infinity)
@@ -107,10 +106,10 @@ struct AddMusicView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.muted)
                 Button("Continue in background") { importer.close() }
-                    .buttonStyle(LightButtonStyle())
+                    .buttonStyle(AccentButtonStyle(height: 42))
             } else {
                 Button(importer.session == nil ? "Close" : "Done") { importer.close() }
-                    .buttonStyle(LightButtonStyle())
+                    .buttonStyle(AccentButtonStyle(height: 42))
                     .keyboardShortcut(.defaultAction)
             }
         }
@@ -224,30 +223,3 @@ private struct EntryRow: View {
     }
 }
 
-// MARK: - Button styles
-
-private struct OutlineSquareButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(Theme.text)
-            .padding(.horizontal, 16)
-            .frame(height: 40)
-            .background(configuration.isPressed ? Color.white.opacity(0.08) : .clear, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(Color.white.opacity(0.3)))
-    }
-}
-
-private struct LightButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(Color(hex: 0x222831))
-            .padding(.horizontal, 20)
-            .frame(height: 42)
-            .background(
-                Color(hex: 0xEEEEEE).opacity(configuration.isPressed ? 0.8 : 1),
-                in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-            )
-    }
-}

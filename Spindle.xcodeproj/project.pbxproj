@@ -15,6 +15,7 @@
 		1F381FC3D553E1C209BD6791 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25B404473930512D232DD38C /* LibraryViewModel.swift */; };
 		2135C8CE9A56B94B221673A1 /* AlbumEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9CD1608BF5B3C5D64B6E39 /* AlbumEditorViewModel.swift */; };
 		220A9E83BCB3C4CDFA9BF6A1 /* FilePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB5E7AF97723AF38E1D4E48 /* FilePicker.swift */; };
+		245BFF60012EAA48FEBB1961 /* AmbientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0E4C2A1CD55ED85B26512D /* AmbientBackground.swift */; };
 		266D122F3D910E1961C1DC53 /* MissingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36691B7FFBB88AFE78DF7CF0 /* MissingItemView.swift */; };
 		2E446EA58EC60211663B9920 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905BDF3E21D7974882366907 /* Playlist.swift */; };
 		2EA880F59F67B9141C0344DC /* SettingsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395E9A208DA6BFEBA2290F3 /* SettingsPopover.swift */; };
@@ -130,6 +131,7 @@
 		A535AE3BDD60A8831239BAFB /* TrackEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEdit.swift; sourceTree = "<group>"; };
 		A56CC78AC2E69604952C88D9 /* TrackEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEditorSheet.swift; sourceTree = "<group>"; };
 		A95857D048CA590668E34BFF /* TrackListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackListView.swift; sourceTree = "<group>"; };
+		AB0E4C2A1CD55ED85B26512D /* AmbientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientBackground.swift; sourceTree = "<group>"; };
 		ACC42F10E2A3FE3A757E7819 /* ArtworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkStore.swift; sourceTree = "<group>"; };
 		AD1F66931C7A56D9994E78FF /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		B1DEB7B527540CE90C62844A /* LibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryService.swift; sourceTree = "<group>"; };
@@ -249,9 +251,17 @@
 			path = Playlists;
 			sourceTree = "<group>";
 		};
+		86871BCAF36619476466EF69 /* Views 2 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Views 2";
+			sourceTree = "<group>";
+		};
 		87D4CFEAC5B2DC9B0185CE01 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				AB0E4C2A1CD55ED85B26512D /* AmbientBackground.swift */,
 				E6203135406ECD08E27854C4 /* ArtworkView.swift */,
 				3BB11D4E5613EF37960B0293 /* Controls.swift */,
 				972FB208C35CCAE11B4331E0 /* CoverEditor.swift */,
@@ -358,6 +368,7 @@
 				A0723AF7523774C9138A4054 /* Services */,
 				3CFC3325B11D4A08967140C7 /* ViewModels */,
 				AEC3CF6D2D55A43F2F71E2D9 /* Views */,
+				86871BCAF36619476466EF69 /* Views 2 */,
 			);
 			path = Spindle;
 			sourceTree = "<group>";
@@ -483,6 +494,7 @@
 				C5C4EC8B582930988381636B /* AlbumEdit.swift in Sources */,
 				11BF1D107D46A6D48F89D3C3 /* AlbumEditorSheet.swift in Sources */,
 				2135C8CE9A56B94B221673A1 /* AlbumEditorViewModel.swift in Sources */,
+				245BFF60012EAA48FEBB1961 /* AmbientBackground.swift in Sources */,
 				DAB9850488C9DCEB72761C3F /* AppEnvironment.swift in Sources */,
 				786E10ACD1994F6464B064B3 /* AppModel.swift in Sources */,
 				133AEF770B3AE9A796370C41 /* AppViewModel.swift in Sources */,
@@ -598,7 +610,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -688,7 +700,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;

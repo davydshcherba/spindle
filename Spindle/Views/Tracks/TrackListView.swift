@@ -109,8 +109,8 @@ struct TrackRow: View {
         .padding(.horizontal, 8)
         .frame(height: 60)
         .background(
-            isHovering ? Theme.surface : .clear,
-            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+            isHovering ? Color.white.opacity(0.09) : .clear,
+            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
         )
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
