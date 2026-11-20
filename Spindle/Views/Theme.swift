@@ -39,23 +39,22 @@ enum Theme {
 
 // MARK: - Button styles
 
+/// The primary action: a Liquid Glass capsule tinted with the accent colour.
 struct AccentButtonStyle: ButtonStyle {
     var height: CGFloat = 36
-    var cornerRadius: CGFloat = 10
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 14, weight: .semibold))
             .foregroundStyle(.white)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 18)
             .frame(height: height)
-            .background(
-                configuration.isPressed ? Theme.accent.opacity(0.8) : Theme.accent,
-                in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            )
+            .accentGlass(in: Capsule())
+            .opacity(configuration.isPressed ? 0.85 : 1)
     }
 }
 
+/// A secondary action: a plain Liquid Glass capsule.
 struct OutlineButtonStyle: ButtonStyle {
     var height: CGFloat = 36
 
@@ -63,10 +62,33 @@ struct OutlineButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: 14, weight: .semibold))
             .foregroundStyle(Theme.text)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 18)
             .frame(height: height)
-            .background(configuration.isPressed ? Color.white.opacity(0.08) : .clear, in: Capsule())
-            .overlay(Capsule().strokeBorder(Color.white.opacity(0.28), lineWidth: 1))
+            .glassEffect(.regular.interactive(), in: Capsule())
+            .opacity(configuration.isPressed ? 0.85 : 1)
+    }
+}
+
+extension View {
+    /// An accent-coloured Liquid Glass shape. A glass tint alone is too faint for the dark olive
+    /// accent on a dark backdrop, so a translucent accent fill sits underneath the glass.
+    func accentGlass<S: Shape>(in shape: S) -> some View {
+        glassEffect(.regular.tint(Theme.accent.opacity(0.55)).interactive(), in: shape)
+            .background(Theme.accent.opacity(0.92), in: shape)
+    }
+
+    /// Accent glass when selected, plain interactive glass otherwise.
+    @ViewBuilder func glassSelected<S: Shape>(_ isSelected: Bool, in shape: S) -> some View {
+        if isSelected {
+            accentGlass(in: shape)
+        } else {
+            glassEffect(.regular.interactive(), in: shape)
+        }
+    }
+
+    /// A Liquid Glass slab with rounded corners (cards, bars, panels).
+    func glassPanel(cornerRadius: CGFloat = 28, tint: Color? = nil) -> some View {
+        glassEffect(.regular.tint(tint), in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 }
 

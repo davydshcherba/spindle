@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Full-page player: large cover, big progress bar and controls, and a background
-/// tinted by the cover's dominant colour. Replaces the whole window while open.
+/// Full-page player: a large cover over a backdrop made of its own colours, with Liquid Glass
+/// controls floating on top. Replaces the whole window while open.
 struct NowPlayingView: View {
     @Environment(PlayerViewModel.self) private var player
     @Environment(AppViewModel.self) private var app
@@ -12,20 +12,20 @@ struct NowPlayingView: View {
             background
 
             GeometryReader { geometry in
-                let coverSide = min(max(geometry.size.height - 440, 220), 470)
+                let coverSide = min(max(geometry.size.height - 470, 220), 440)
                 VStack(spacing: 0) {
                     topBar
-                    Spacer(minLength: 10)
+                    Spacer(minLength: 8)
                     cover(side: coverSide)
-                    info.padding(.top, 30)
-                    progress.padding(.top, 22)
-                    TransportControls(playSize: 84, iconSize: 20, spacing: 38)
-                        .padding(.top, 14)
-                    Spacer(minLength: 10)
+                    info.padding(.top, 26)
+                    timeline.padding(.top, 20)
+                    TransportControls(playSize: 78, iconSize: 18, spacing: 16, glass: true)
+                        .padding(.top, 16)
+                    Spacer(minLength: 8)
                     bottomBar
                 }
-                // Make room for the queue so nothing is hidden underneath it.
-                .padding(.trailing, app.isQueueVisible ? QueuePanel.width : 0)
+                // Make room for the floating queue so nothing is hidden underneath it.
+                .padding(.trailing, app.isQueueVisible ? QueuePanel.width + 16 : 0)
             }
             .ignoresSafeArea(.container, edges: .top)
 
@@ -45,23 +45,31 @@ struct NowPlayingView: View {
 
     // MARK: Background
 
+    /// The cover itself, blown up and blurred, so the glass above has real colour to refract.
     private var background: some View {
-        let tint = player.tint.map(Color.init) ?? Theme.surface
+        let tint = player.tint.map(Color.init) ?? Theme.accent
         return ZStack {
             Theme.background
+            if let key = player.currentItem?.artworkKey {
+                ArtworkView(key: key, pixelSize: 128, cornerRadius: 0)
+                    .frame(width: 400, height: 400)
+                    .blur(radius: 20, opaque: true)
+                    .scaleEffect(4)
+                    .saturation(1.35)
+                    .opacity(0.34)
+                    .transition(.opacity)
+            }
+            // Keeps light covers from washing the page out: the mood stays dark.
+            Theme.background.opacity(0.28)
             RadialGradient(
-                colors: [tint.opacity(0.62), tint.opacity(0.18), .clear],
-                center: UnitPoint(x: 0.5, y: 0.3),
-                startRadius: 0,
-                endRadius: 780
+                colors: [tint.opacity(0.40), .clear],
+                center: UnitPoint(x: 0.5, y: 0.3), startRadius: 0, endRadius: 720
             )
-            LinearGradient(
-                colors: [.clear, Theme.background.opacity(0.9)],
-                startPoint: .center,
-                endPoint: .bottom
-            )
+            LinearGradient(colors: [.clear, Theme.background.opacity(0.8)], startPoint: .center, endPoint: .bottom)
         }
+        .clipped()
         .ignoresSafeArea()
+        .animation(.easeInOut(duration: 0.8), value: player.currentItem?.artworkKey)
         .animation(.easeInOut(duration: 0.8), value: player.tint)
     }
 
@@ -72,13 +80,14 @@ struct NowPlayingView: View {
             Text(player.contextLabel.uppercased())
                 .font(.system(size: 11, weight: .semibold))
                 .tracking(1.8)
-                .foregroundStyle(Theme.text.opacity(0.65))
+                .foregroundStyle(Theme.text.opacity(0.7))
 
             HStack {
-                IconButton(systemName: "chevron.down", size: 15, color: Theme.text, help: "Close Now Playing") {
-                    app.dismissNowPlaying()
-                }
-                .padding(.leading, 78)
+                IconButton(
+                    systemName: "chevron.down", size: 15, color: Theme.text,
+                    help: "Close Now Playing", glass: true, diameter: 40
+                ) { app.dismissNowPlaying() }
+                .padding(.leading, 74)
                 Spacer()
                 Menu {
                     Button(app.isQueueVisible ? "Hide Queue" : "Show Queue") { app.isQueueVisible.toggle() }
@@ -88,9 +97,10 @@ struct NowPlayingView: View {
                 } label: {
                     Image(systemName: "ellipsis")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Theme.text.opacity(0.8))
-                        .frame(width: 36, height: 36)
-                        .contentShape(Rectangle())
+                        .foregroundStyle(Theme.text.opacity(0.9))
+                        .frame(width: 40, height: 40)
+                        .glassEffect(.regular.interactive(), in: Circle())
+                        .contentShape(Circle())
                 }
                 .menuStyle(.button)
                 .buttonStyle(.plain)
@@ -104,9 +114,9 @@ struct NowPlayingView: View {
     }
 
     private func cover(side: CGFloat) -> some View {
-        ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 1024, cornerRadius: 16)
+        ArtworkView(key: player.currentItem?.artworkKey, pixelSize: 1024, cornerRadius: 28)
             .frame(width: side, height: side)
-            .shadow(color: .black.opacity(0.5), radius: 34, y: 18)
+            .shadow(color: .black.opacity(0.45), radius: 36, y: 20)
             .scaleEffect(player.isPlaying ? 1 : 0.93)
             .animation(.spring(duration: 0.5, bounce: 0.25), value: player.isPlaying)
     }
@@ -119,14 +129,15 @@ struct NowPlayingView: View {
                 .lineLimit(1)
             Text(player.subtitle)
                 .font(.system(size: 17))
-                .foregroundStyle(Theme.text.opacity(0.6))
+                .foregroundStyle(Theme.text.opacity(0.65))
                 .lineLimit(1)
         }
         .padding(.horizontal, 60)
         .multilineTextAlignment(.center)
     }
 
-    private var progress: some View {
+    /// The progress bar and times on their own glass card.
+    private var timeline: some View {
         VStack(spacing: 2) {
             SeekBar(
                 progress: player.progress,
@@ -144,15 +155,18 @@ struct NowPlayingView: View {
             }
             .font(.system(size: 12))
             .monospacedDigit()
-            .foregroundStyle(Theme.text.opacity(0.6))
+            .foregroundStyle(Theme.text.opacity(0.65))
         }
-        .frame(maxWidth: 800)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+        .frame(maxWidth: 720)
+        .glassPanel(cornerRadius: 28)
         .padding(.horizontal, 40)
     }
 
     private var bottomBar: some View {
-        HStack {
-            HStack(spacing: 26) {
+        GlassEffectContainer(spacing: 10) {
+            HStack(spacing: 12) {
                 LabelButton(title: "Add to playlist", systemImage: "text.badge.plus") {
                     isPickerPresented = true
                 }
@@ -163,50 +177,55 @@ struct NowPlayingView: View {
                     }
                 }
 
-                LabelButton(
-                    title: "Queue", systemImage: "list.bullet",
-                    tint: app.isQueueVisible ? Theme.accentLight : Theme.muted
-                ) { app.isQueueVisible.toggle() }
-            }
-            Spacer()
-            HStack(spacing: 8) {
-                IconButton(systemName: player.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill", size: 15, help: player.isMuted ? "Unmute" : "Mute") {
-                    player.toggleMute()
+                LabelButton(title: "Queue", systemImage: "list.bullet", isActive: app.isQueueVisible) {
+                    app.isQueueVisible.toggle()
                 }
-                SeekBar(
-                    progress: player.volume,
-                    thickness: 4,
-                    thumbSize: 12,
-                    fill: Theme.text,
-                    accessibilityName: "Volume",
-                    onChanged: { player.volume = $0 },
-                    onEnded: { player.volume = $0 }
-                )
-                .frame(width: 150)
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    IconButton(
+                        systemName: player.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill", size: 15,
+                        help: player.isMuted ? "Unmute" : "Mute"
+                    ) { player.toggleMute() }
+                    SeekBar(
+                        progress: player.volume,
+                        thickness: 4,
+                        thumbSize: 12,
+                        fill: Theme.text,
+                        accessibilityName: "Volume",
+                        onChanged: { player.volume = $0 },
+                        onEnded: { player.volume = $0 }
+                    )
+                    .frame(width: 140)
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 40)
+                .glassEffect(.regular, in: Capsule())
             }
         }
         .padding(.horizontal, 36)
-        .padding(.bottom, 28)
+        .padding(.bottom, 26)
     }
 }
 
+/// A text button on its own Liquid Glass capsule.
 private struct LabelButton: View {
     let title: String
     let systemImage: String
-    var tint: Color = Theme.muted
-    var hoverTint: Color = Theme.text
+    var isActive = false
     let action: () -> Void
-
-    @State private var isHovering = false
 
     var body: some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(isHovering ? hoverTint : tint)
-                .contentShape(Rectangle())
+                .foregroundStyle(isActive ? Color.white : Theme.text.opacity(0.9))
+                .padding(.horizontal, 16)
+                .frame(height: 40)
+                .glassSelected(isActive, in: Capsule())
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .onHover { isHovering = $0 }
     }
 }

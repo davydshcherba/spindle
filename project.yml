@@ -2,7 +2,8 @@ name: Spindle
 options:
   bundleIdPrefix: com.spindle
   deploymentTarget:
-    macOS: "15.0"
+    # Liquid Glass (glassEffect, GlassEffectContainer, safeAreaBar) needs macOS 26.
+    macOS: "26.0"
   developmentLanguage: en
   createIntermediateGroups: true
   generateEmptyDirectories: true

@@ -108,9 +108,8 @@ struct CoverCard<Cover: View, Menu: View>: View {
                         Image(systemName: "play.fill")
                             .font(.system(size: 15, weight: .bold))
                             .foregroundStyle(.white)
-                            .frame(width: 42, height: 42)
-                            .background(Theme.accent, in: Circle())
-                            .shadow(color: .black.opacity(0.4), radius: 8, y: 3)
+                            .frame(width: 44, height: 44)
+                            .accentGlass(in: Circle())
                     }
                     .buttonStyle(.plain)
                     .padding(10)
@@ -265,7 +264,7 @@ struct EmptyLibraryView: View {
                 }
                 .padding(.horizontal, 12)
             }
-            .buttonStyle(AccentButtonStyle(height: 56, cornerRadius: 14))
+            .buttonStyle(AccentButtonStyle(height: 56))
             .padding(.top, 28)
 
             Text("or drop files anywhere in this window")

@@ -7,7 +7,7 @@
 **A minimal music player for your own files.**<br>
 mp3 · m4a · flac · wav — no accounts, no streaming, no tracking.
 
-<img alt="macOS 15+" src="https://img.shields.io/badge/macOS-15%2B-1f2937?logo=apple&logoColor=white">
+<img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-1f2937?logo=apple&logoColor=white">
 <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
 <img alt="SwiftUI" src="https://img.shields.io/badge/UI-SwiftUI-0A84FF">
 <img alt="Dependencies: 0" src="https://img.shields.io/badge/dependencies-0-637545">
@@ -44,8 +44,10 @@ bought. Spindle is a calm, fast player for exactly that. Point it at a folder an
   queue (play next, add to queue, jump, remove).
 - **Edit anything** — songs, albums and playlists, including cover pictures. Rename an album to merge it with another,
   or put every song into one album. Your files are never modified.
-- **Mac-native** — a *Playback* menu with Space, ⌘← and ⌘→, a single window, a dark theme with a deliberate palette
-  (`#222831` · `#37353E` · `#637545`).
+- **Liquid Glass** — floating glass bars, buttons and panels (macOS 26): the top bar and the player float over the
+  content, which scrolls underneath, and the backdrop picks up the colours of the cover that's playing.
+- **Mac-native** — a *Playback* menu with Space, ⌘← and ⌘→, a single window, and a dark theme with a deliberate
+  palette (`#222831` · `#637545`).
 
 ## A look around
 
@@ -76,7 +78,7 @@ The designs this follows live in [`docs/design.pdf`](docs/design.pdf).
 
 ## Get it running
 
-**Requirements:** macOS 15+ and Xcode 26 (Swift 6). [XcodeGen](https://github.com/yonaskolb/XcodeGen) is only needed
+**Requirements:** macOS 26+ (for Liquid Glass) and Xcode 26 (Swift 6). [XcodeGen](https://github.com/yonaskolb/XcodeGen) is only needed
 to regenerate the Xcode project from `project.yml` (`brew install xcodegen`); the generated project is checked in.
 
 ```sh

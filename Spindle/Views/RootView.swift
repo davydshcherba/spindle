@@ -15,17 +15,18 @@ struct RootView: View {
         @Bindable var app = app
 
         ZStack {
-            VStack(spacing: 0) {
-                TopBar()
-                page
-                    .id(app.route)
-                    .transition(.opacity)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                PlayerBar()
-            }
-            // The title bar is hidden: let the top bar run underneath the traffic lights.
-            .ignoresSafeArea(.container, edges: .top)
-            .blur(radius: app.isAddMusicPresented ? 10 : 0)
+            AmbientBackground()
+
+            page
+                .id(app.route)
+                .transition(.opacity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Floating Liquid Glass bars: the page scrolls underneath them.
+                .safeAreaBar(edge: .top, spacing: 0) { TopBar() }
+                .safeAreaBar(edge: .bottom, spacing: 0) { PlayerBar() }
+                // The title bar is hidden: let the top bar run underneath the traffic lights.
+                .ignoresSafeArea(.container, edges: .top)
+                .blur(radius: app.isAddMusicPresented ? 10 : 0)
 
             if app.isAddMusicPresented {
                 AddMusicView().transition(.opacity)
@@ -42,7 +43,7 @@ struct RootView: View {
         .overlay(alignment: .bottom) {
             if let message = toasts.message {
                 ToastView(message: message)
-                    .padding(.bottom, app.isNowPlayingPresented ? 110 : 118)
+                    .padding(.bottom, app.isNowPlayingPresented ? 110 : 112)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(3)
             }
@@ -52,8 +53,9 @@ struct RootView: View {
         .animation(.smooth(duration: 0.4), value: app.isNowPlayingPresented)
         .animation(.smooth(duration: 0.25), value: toasts.message)
         .frame(minWidth: 980, minHeight: 640)
-        .background(Theme.background.ignoresSafeArea())
         .preferredColorScheme(.dark)
+        // The backdrop picks up the colour of the cover that's playing.
+        .task(id: player.currentItem?.artworkKey) { await player.refreshTint() }
         .dropDestination(for: URL.self) { urls, _ in
             importer.handleDrop(urls)
         } isTargeted: { importer.isDropTargeted = $0 }

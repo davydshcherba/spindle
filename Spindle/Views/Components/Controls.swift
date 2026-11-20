@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// A borderless icon button that brightens on hover.
+/// A borderless icon button that brightens on hover. With `glass`, it sits on its own
+/// Liquid Glass circle (for controls floating over content, not inside another glass slab).
 struct IconButton: View {
     let systemName: String
     var size: CGFloat = 17
@@ -8,17 +9,18 @@ struct IconButton: View {
     var hoverColor: Color = Theme.text
     let help: String
     var isEnabled = true
+    var glass = false
+    /// Overrides the touch target; defaults to the icon size plus padding.
+    var diameter: CGFloat?
     let action: () -> Void
 
     @State private var hovering = false
 
     var body: some View {
+        let side = diameter ?? (size + 16)
         Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: size, weight: .medium))
-                .foregroundStyle(hovering && isEnabled ? hoverColor : color)
-                .frame(width: size + 16, height: size + 16)
-                .contentShape(Rectangle())
+            icon(side: side)
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
@@ -26,6 +28,18 @@ struct IconButton: View {
         .onHover { hovering = $0 }
         .help(help)
         .accessibilityLabel(help)
+    }
+
+    @ViewBuilder private func icon(side: CGFloat) -> some View {
+        let image = Image(systemName: systemName)
+            .font(.system(size: size, weight: .medium))
+            .foregroundStyle(hovering && isEnabled ? hoverColor : color)
+            .frame(width: side, height: side)
+        if glass {
+            image.glassEffect(.regular.interactive(), in: Circle())
+        } else {
+            image
+        }
     }
 }
 
@@ -35,25 +49,17 @@ struct FilterChip: View {
     let isSelected: Bool
     let action: () -> Void
 
-    @State private var hovering = false
-
     var body: some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(isSelected ? Color.white : Theme.text.opacity(0.9))
-                .padding(.horizontal, 16)
-                .frame(height: 34)
-                .background(background, in: Capsule())
+                .foregroundStyle(isSelected ? Color.white : Theme.text.opacity(0.92))
+                .padding(.horizontal, 18)
+                .frame(height: 36)
+                .glassSelected(isSelected, in: Capsule())
         }
         .buttonStyle(.plain)
-        .onHover { hovering = $0 }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-
-    private var background: Color {
-        if isSelected { return Theme.accent }
-        return hovering ? Theme.surfaceHover : Theme.surface
     }
 }
 
@@ -62,26 +68,27 @@ struct LayoutToggle: View {
     @Binding var layout: LibraryViewModel.Layout
 
     var body: some View {
-        HStack(spacing: 2) {
-            segment("square.grid.2x2", .grid, help: "Grid view")
-            segment("list.bullet", .list, help: "List view")
+        GlassEffectContainer(spacing: 6) {
+            HStack(spacing: 6) {
+                segment("square.grid.2x2", .grid, help: "Grid view")
+                segment("list.bullet", .list, help: "List view")
+            }
         }
-        .padding(3)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private func segment(_ symbol: String, _ value: LibraryViewModel.Layout, help: String) -> some View {
-        Button { layout = value } label: {
+        let isSelected = layout == value
+        return Button { layout = value } label: {
             Image(systemName: symbol)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(layout == value ? Color.white : Theme.muted)
-                .frame(width: 34, height: 28)
-                .background(layout == value ? Theme.accent : .clear, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(isSelected ? Color.white : Theme.muted)
+                .frame(width: 42, height: 36)
+                .glassSelected(isSelected, in: Capsule())
         }
         .buttonStyle(.plain)
         .help(help)
         .accessibilityLabel(help)
-        .accessibilityAddTraits(layout == value ? .isSelected : [])
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -114,9 +121,9 @@ struct SortMenu<Option: Hashable & Identifiable & RawRepresentable>: View where 
             }
             .font(.system(size: 14, weight: .medium))
             .foregroundStyle(Theme.muted)
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .frame(height: 36)
-            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .glassEffect(.regular.interactive(), in: Capsule())
         }
         .menuStyle(.button)
         .buttonStyle(.plain)
@@ -132,11 +139,9 @@ struct ToastView: View {
         Text(message)
             .font(.system(size: 14, weight: .medium))
             .foregroundStyle(Theme.text)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 11)
-            .background(Theme.surface, in: Capsule())
-            .overlay(Capsule().strokeBorder(Theme.hairline))
-            .shadow(color: .black.opacity(0.35), radius: 14, y: 6)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .glassEffect(.regular, in: Capsule())
             .accessibilityAddTraits(.isStaticText)
     }
 }
