@@ -23,6 +23,12 @@ nonisolated struct QueueEntry: Identifiable, Hashable, Sendable {
         self.id = UUID()
         self.item = item
     }
+
+    /// Same slot, new snapshot (used when a track's info is edited while it's queued).
+    init(id: UUID, item: PlayerItem) {
+        self.id = id
+        self.item = item
+    }
 }
 
 nonisolated enum RepeatMode: String, CaseIterable, Sendable {

@@ -7,7 +7,13 @@ import Observation
 final class ImportViewModel {
     var skipDuplicates = true
     var isDropTargeted = false
+    /// Put every new song in one album ("My songs") instead of the album its tags name.
+    var putInOneAlbum: Bool {
+        didSet { defaults.set(putInOneAlbum, forKey: Self.oneAlbumKey) }
+    }
 
+    private static let oneAlbumKey = "import.putInOneAlbum"
+    @ObservationIgnored private let defaults: UserDefaults
     private let library: LibraryService
     private let picker: any FilePicking
     private let app: AppViewModel
@@ -15,7 +21,12 @@ final class ImportViewModel {
 
     @ObservationIgnored private var observedFinish: ImportSession?
 
-    init(library: LibraryService, picker: any FilePicking, app: AppViewModel, toasts: ToastCenter) {
+    init(
+        library: LibraryService, picker: any FilePicking, app: AppViewModel, toasts: ToastCenter,
+        defaults: UserDefaults = .standard
+    ) {
+        self.defaults = defaults
+        self.putInOneAlbum = defaults.bool(forKey: Self.oneAlbumKey)
         self.library = library
         self.picker = picker
         self.app = app
@@ -47,7 +58,10 @@ final class ImportViewModel {
 
     private func start(_ urls: [URL]) {
         guard !urls.isEmpty else { return }
-        library.importItems(urls, skipDuplicates: skipDuplicates)
+        library.importItems(
+            urls, skipDuplicates: skipDuplicates,
+            singleAlbum: putInOneAlbum ? LibraryDefaults.songsAlbum : nil
+        )
         app.isAddMusicPresented = true
         Task { await announceCompletion() }
     }

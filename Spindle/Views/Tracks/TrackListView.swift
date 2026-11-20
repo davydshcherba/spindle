@@ -89,12 +89,6 @@ struct TrackRow: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(isCurrent ? Theme.accentLight : Theme.text)
                     .lineLimit(1)
-                if track.isFavorite {
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.accentLight)
-                        .accessibilityLabel("Liked")
-                }
             }
             .frame(width: columns.title, alignment: .leading)
 

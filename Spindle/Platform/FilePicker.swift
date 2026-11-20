@@ -2,6 +2,7 @@ import Foundation
 
 #if os(macOS)
 import AppKit
+import UniformTypeIdentifiers
 #endif
 
 /// How the app asks the user for files. A seam so the import flow stays
@@ -9,6 +10,8 @@ import AppKit
 protocol FilePicking {
     func pickFiles() async -> [URL]
     func pickFolders() async -> [URL]
+    /// A single picture, for covers.
+    func pickImage() async -> URL?
 }
 
 #if os(macOS)
@@ -35,6 +38,18 @@ struct MacFilePicker: FilePicking {
         panel.canCreateDirectories = false
         panel.allowsMultipleSelection = true
         return await run(panel)
+    }
+
+    func pickImage() async -> URL? {
+        let panel = NSOpenPanel()
+        panel.title = "Choose a cover"
+        panel.prompt = "Choose"
+        panel.message = "Pick a picture to use as the cover"
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [.image]
+        return await run(panel).first
     }
 
     private func run(_ panel: NSOpenPanel) async -> [URL] {

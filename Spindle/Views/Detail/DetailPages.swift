@@ -22,7 +22,7 @@ struct PlaylistDetailView: View {
             ) {
                 PlaylistMosaic(keys: summary.artworkKeys, pixelSize: 512, cornerRadius: 12)
             } moreMenu: {
-                Button("Rename\u{2026}") { app.playlistEditor = .rename(summary.id) }
+                Button("Edit\u{2026}") { app.playlistEditor = .edit(summary.id) }
                 Button("Delete Playlist\u{2026}", role: .destructive) { app.playlistPendingDeletion = summary.id }
             }
         } else {
@@ -56,6 +56,8 @@ struct AlbumDetailView: View {
                 ArtworkView(key: album.artworkKey, pixelSize: 512, cornerRadius: 12)
             } moreMenu: {
                 CollectionMenu(tracks: album.tracks, context: album.title)
+                Divider()
+                Button("Edit Album\u{2026}") { app.edit(album) }
             }
         } else {
             MissingItemView(message: "This album is no longer in your library.", backTitle: "My Music") { app.show(.myMusic) }

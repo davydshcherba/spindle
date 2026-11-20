@@ -56,4 +56,17 @@ Debug builds only (compiled out of Release): set `SPINDLE_SEED_DIR` to import a 
 
 ## Not in the MVP
 
-The turntable "vinyl" Now Playing variant from the design, light theme, gapless playback, editing tags, and iOS UI.
+The turntable "vinyl" Now Playing variant from the design, light theme, gapless playback, and iOS UI.
+
+You can edit, from the right-click menus:
+
+- **a song** (**Edit Info…**): title, artist, album, album artist, year, track number and its cover picture;
+- **an album** (**Edit Album…**): name, album artist, year and a cover picture, for every song in it. Albums with the
+  same name and album artist are one album, so renaming an album to match another merges them;
+- **a playlist** (**Edit…**): name and a cover picture (otherwise the cover is a mosaic of its songs).
+
+Edits are stored in Spindle's library only: the app has read-only access to your files, so tags inside the files are
+never rewritten. A picture you choose is copied into Spindle's own cache.
+
+To get one album for everything instead of one album per song, use **Settings → Put all songs in one album…**
+(existing songs) or the **Put new songs in "My songs"** switch in the Add music dialog (future imports).

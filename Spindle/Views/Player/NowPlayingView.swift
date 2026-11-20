@@ -82,8 +82,8 @@ struct NowPlayingView: View {
                 Spacer()
                 Menu {
                     Button(app.isQueueVisible ? "Hide Queue" : "Show Queue") { app.isQueueVisible.toggle() }
-                    Button(player.currentTrack?.isFavorite == true ? "Remove from Liked" : "Add to Liked") {
-                        player.toggleFavoriteOfCurrent()
+                    if let track = player.currentTrack {
+                        Button("Edit Info\u{2026}") { app.edit(track) }
                     }
                 } label: {
                     Image(systemName: "ellipsis")
@@ -167,14 +167,6 @@ struct NowPlayingView: View {
                     title: "Queue", systemImage: "list.bullet",
                     tint: app.isQueueVisible ? Theme.accentLight : Theme.muted
                 ) { app.isQueueVisible.toggle() }
-
-                let isFavorite = player.currentTrack?.isFavorite == true
-                LabelButton(
-                    title: isFavorite ? "Liked" : "Like",
-                    systemImage: isFavorite ? "heart.fill" : "heart",
-                    tint: isFavorite ? Theme.accentLight : Theme.muted,
-                    hoverTint: Theme.accentLight
-                ) { player.toggleFavoriteOfCurrent() }
             }
             Spacer()
             HStack(spacing: 8) {

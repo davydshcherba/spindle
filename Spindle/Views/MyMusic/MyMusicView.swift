@@ -161,6 +161,8 @@ struct AlbumCard: View {
             ArtworkView(key: album.artworkKey, pixelSize: 512, cornerRadius: 12)
         } menu: {
             CollectionMenu(tracks: album.tracks, context: album.title)
+            Divider()
+            Button("Edit Album\u{2026}") { app.edit(album) }
         }
     }
 }

@@ -119,11 +119,6 @@ final class PlayerViewModel {
     func playNext(_ tracks: [Track]) { service.playNext(tracks.map(\.playerItem)) }
     func addToQueue(_ tracks: [Track]) { service.addToQueue(tracks.map(\.playerItem)) }
 
-    func toggleFavoriteOfCurrent() {
-        guard let track = currentTrack else { return }
-        library.toggleFavorite(track)
-    }
-
     // MARK: Cover tint
 
     func refreshTint() async {

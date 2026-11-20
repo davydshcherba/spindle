@@ -247,6 +247,29 @@ final class PlayerService {
         emit(.queueChanged)
     }
 
+    /// Replaces the stored snapshot of a track after its info was edited, so the player bar,
+    /// queue and Now Playing show the new title/artist/album straight away.
+    func updateItem(_ item: PlayerItem) { updateItems([item]) }
+
+    func updateItems(_ items: [PlayerItem]) {
+        let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
+        func replace(in entries: inout [QueueEntry]) -> Bool {
+            var changed = false
+            for index in entries.indices {
+                if let updated = byID[entries[index].item.id] {
+                    entries[index] = QueueEntry(id: entries[index].id, item: updated)
+                    changed = true
+                }
+            }
+            return changed
+        }
+        let wasQueued = replace(in: &queue)
+        _ = replace(in: &originalOrder)
+        guard wasQueued else { return }
+        let currentWasEdited = currentItem.map { byID[$0.id] != nil } ?? false
+        emit(currentWasEdited ? .itemChanged : .queueChanged)
+    }
+
     func clearError() { errorMessage = nil }
 
     // MARK: Loading

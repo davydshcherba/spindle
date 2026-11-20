@@ -113,6 +113,7 @@ struct TrackContextMenu: View {
 
     @Environment(PlayerViewModel.self) private var player
     @Environment(LibraryViewModel.self) private var library
+    @Environment(AppViewModel.self) private var app
 
     var body: some View {
         Button("Play") { player.play(track, in: tracks, context: context) }
@@ -120,9 +121,7 @@ struct TrackContextMenu: View {
         Button("Add to Queue") { player.addToQueue([track]) }
         Divider()
         AddToPlaylistMenu(tracks: [track])
-        Button(track.isFavorite ? "Remove from Liked" : "Add to Liked") {
-            library.library.toggleFavorite(track)
-        }
+        Button("Edit Info\u{2026}") { app.edit(track) }
         Divider()
         if let onRemove {
             Button("Remove from Playlist", role: .destructive) { onRemove(track) }

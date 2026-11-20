@@ -7,7 +7,7 @@ import Foundation
 ///
 ///     SPINDLE_SEED_DIR=/path/inside/container   import this folder once if the library is empty
 ///     SPINDLE_SCREEN=list,play                  comma-separated: grid, list, artists, recent, playlists,
-///                                               playlist, album, play, nowplaying, queue, add
+///                                               playlist, album, play, nowplaying, queue, add, edit, albumedit, playlistedit
 ///
 /// The app is sandboxed, so the seed folder must be readable by it (e.g. inside its container).
 extension AppModel {
@@ -38,6 +38,11 @@ extension AppModel {
                 app.navigate(to: .album(first.id))
             }
             if screens.contains("add") { app.presentAddMusic() }
+            if screens.contains("edit"), let first = self.library.visibleTracks.first { app.edit(first) }
+            if screens.contains("albumedit"), let first = self.library.visibleAlbums.first { app.edit(first) }
+            if screens.contains("playlistedit"), let first = playlists.summaries.first {
+                app.playlistEditor = .edit(first.id)
+            }
 
             let wantsPlayback = !screens.isDisjoint(with: ["play", "nowplaying", "queue"])
             if wantsPlayback, let first = self.library.visibleTracks.first {

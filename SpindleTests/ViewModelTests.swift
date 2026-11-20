@@ -3,15 +3,17 @@ import Testing
 @testable import Spindle
 
 /// A picker that returns whatever it was given, standing in for NSOpenPanel.
-private struct FakePicker: FilePicking {
+struct FakePicker: FilePicking {
     var files: [URL] = []
     var folders: [URL] = []
+    var image: URL?
     func pickFiles() async -> [URL] { files }
     func pickFolders() async -> [URL] { folders }
+    func pickImage() async -> URL? { image }
 }
 
 @MainActor
-private struct Rig {
+struct Rig {
     let harness: LibraryHarness
     let service: PlayerService
     let library: LibraryViewModel
@@ -244,19 +246,6 @@ struct PlayerViewModelTests {
         #expect(rig.player.volume == 1)
         rig.player.volume = -1
         #expect(rig.player.volume == 0)
-    }
-
-    @Test func favoriteToggleTargetsTheCurrentTrack() async throws {
-        let rig = try await Rig.make()
-        defer { rig.harness.cleanUp() }
-        let tracks = rig.library.visibleTracks
-        rig.player.play(tracks[0], in: tracks, context: "My Music")
-
-        rig.player.toggleFavoriteOfCurrent()
-
-        #expect(tracks[0].isFavorite)
-        #expect(tracks.dropFirst().allSatisfy { !$0.isFavorite })
-        rig.service.stop()
     }
 
     @Test func tintComesFromTheCoverColour() async throws {

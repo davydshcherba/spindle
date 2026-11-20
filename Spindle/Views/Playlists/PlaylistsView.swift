@@ -101,7 +101,7 @@ struct PlaylistCard: View {
             Button("Play") { play(shuffled: false) }
             Button("Shuffle") { play(shuffled: true) }
             Divider()
-            Button("Rename\u{2026}") { app.playlistEditor = .rename(summary.id) }
+            Button("Edit\u{2026}") { app.playlistEditor = .edit(summary.id) }
             Button("Delete\u{2026}", role: .destructive) { app.playlistPendingDeletion = summary.id }
         }
     }

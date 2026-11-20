@@ -22,8 +22,12 @@ final class PlaylistsViewModel {
         var name: String { playlist.name }
         var trackCount: Int { tracks.count }
         var duration: TimeInterval { tracks.reduce(0) { $0 + $1.duration } }
-        /// Up to four distinct covers, for the 2×2 mosaic.
-        let artworkKeys: [String]
+        /// Up to four distinct covers of the songs inside, for the automatic 2×2 mosaic.
+        let autoArtworkKeys: [String]
+        /// The picture the user chose, if any.
+        var coverKey: String? { playlist.coverKey }
+        /// What to show: the chosen picture, otherwise the mosaic.
+        var artworkKeys: [String] { coverKey.map { [$0] } ?? autoArtworkKeys }
         /// "32 tracks · 2 h 4 min"
         var detail: String {
             trackCount == 0
@@ -77,6 +81,12 @@ final class PlaylistsViewModel {
         library.rename(playlist, to: name)
     }
 
+    /// Saves a new name and/or cover picture.
+    func update(_ id: UUID, name: String, cover: Change<String?>) {
+        guard let playlist = library.playlists.first(where: { $0.id == id }) else { return }
+        library.update(playlist, name: name, cover: cover)
+    }
+
     func delete(_ id: UUID) {
         guard let playlist = library.playlists.first(where: { $0.id == id }) else { return }
         let name = playlist.name
@@ -107,7 +117,7 @@ final class PlaylistsViewModel {
     private func makeSummary(_ playlist: Playlist) -> Summary {
         let tracks = library.tracks(in: playlist)
         let keys = tracks.compactMap(\.artworkKey).removingDuplicates().prefix(4)
-        return Summary(playlist: playlist, tracks: tracks, artworkKeys: Array(keys))
+        return Summary(playlist: playlist, tracks: tracks, autoArtworkKeys: Array(keys))
     }
 
     private func order(_ a: Summary, _ b: Summary) -> Bool {

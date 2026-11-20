@@ -47,6 +47,16 @@ nonisolated final class ArtworkStore: @unchecked Sendable {
         }
     }
 
+    /// Reads a picture the user chose and stores it like embedded artwork. Returns nil if the
+    /// file can't be read or isn't an image.
+    @concurrent
+    func storeImage(at url: URL) async -> String? {
+        let isScoped = url.startAccessingSecurityScopedResource()
+        defer { if isScoped { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url, options: .mappedIfSafe), data.count < 60_000_000 else { return nil }
+        return store(data)
+    }
+
     // MARK: Reading
 
     /// Returns an already-decoded image without touching the disk.

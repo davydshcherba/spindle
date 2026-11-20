@@ -17,6 +17,7 @@ struct SpindleApp: App {
                     .environment(model.player)
                     .environment(model.importer)
                     .environment(model.toasts)
+                    .environment(model.covers)
                     .environment(\.artworkStore, model.artwork)
             case .failure(let error):
                 StartupErrorView(error: error)

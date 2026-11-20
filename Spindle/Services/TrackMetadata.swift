@@ -20,6 +20,12 @@ nonisolated enum UnknownTag {
     static let album = "Unknown Album"
 }
 
+/// Names Spindle uses when it groups songs itself.
+nonisolated enum LibraryDefaults {
+    static let songsAlbum = "My songs"
+    static let variousArtists = "Various Artists"
+}
+
 nonisolated enum TagParsing {
     /// "3", "3/12" and " 03 " all parse to 3.
     static func leadingInt(_ text: String) -> Int? {

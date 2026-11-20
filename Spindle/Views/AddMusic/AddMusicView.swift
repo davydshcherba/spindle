@@ -89,12 +89,15 @@ struct AddMusicView: View {
     private var footer: some View {
         @Bindable var importer = importer
         return HStack(spacing: 14) {
-            Toggle("Skip duplicates", isOn: $importer.skipDuplicates)
-                .toggleStyle(.switch)
-                .tint(Theme.accent)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Theme.text)
-                .fixedSize()
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle("Skip duplicates", isOn: $importer.skipDuplicates)
+                Toggle("Put new songs in \u{201C}\(LibraryDefaults.songsAlbum)\u{201D}", isOn: $importer.putInOneAlbum)
+            }
+            .toggleStyle(.switch)
+            .tint(Theme.accent)
+            .font(.system(size: 14, weight: .medium))
+            .foregroundStyle(Theme.text)
+            .fixedSize()
 
             Spacer()
 

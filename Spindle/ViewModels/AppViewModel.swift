@@ -14,15 +14,15 @@ enum Tab: Hashable {
     case playlists
 }
 
-/// The "create or rename a playlist" sheet.
+/// The "create or edit a playlist" sheet.
 enum PlaylistEditor: Identifiable, Equatable {
     case create(adding: [UUID])
-    case rename(UUID)
+    case edit(UUID)
 
     var id: String {
         switch self {
         case .create: "create"
-        case .rename(let id): "rename-\(id)"
+        case .edit(let id): "edit-\(id)"
         }
     }
 }
@@ -39,6 +39,10 @@ final class AppViewModel {
     var isAddMusicPresented = false
     var playlistEditor: PlaylistEditor?
     var playlistPendingDeletion: UUID?
+    /// The track whose info is open in the editor sheet.
+    var trackBeingEdited: Track?
+    /// The album open in the album editor sheet.
+    var albumBeingEdited: Album?
 
     var tab: Tab {
         switch route {
@@ -81,5 +85,10 @@ final class AppViewModel {
     }
 
     func presentAddMusic() { isAddMusicPresented = true }
+    func edit(_ track: Track) { trackBeingEdited = track }
+    func edit(_ album: Album) { albumBeingEdited = album }
+
+    /// Swaps the page being shown without adding a history entry (e.g. an album whose id changed).
+    func replaceRoute(_ destination: Route) { route = destination }
     func newPlaylist(adding trackIDs: [UUID] = []) { playlistEditor = .create(adding: trackIDs) }
 }

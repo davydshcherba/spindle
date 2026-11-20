@@ -9,6 +9,7 @@ struct RootView: View {
     @Environment(LibraryViewModel.self) private var library
     @Environment(PlaylistsViewModel.self) private var playlists
     @Environment(ToastCenter.self) private var toasts
+    @Environment(CoverImporter.self) private var covers
 
     var body: some View {
         @Bindable var app = app
@@ -57,7 +58,18 @@ struct RootView: View {
             importer.handleDrop(urls)
         } isTargeted: { importer.isDropTargeted = $0 }
         .sheet(item: $app.playlistEditor) { editor in
-            PlaylistNameSheet(editor: editor)
+            PlaylistEditorSheet(editor: editor, playlists: playlists, covers: covers) { created in
+                app.navigate(to: .playlist(created))
+            }
+        }
+        .sheet(item: $app.albumBeingEdited) { album in
+            AlbumEditorSheet(album: album, library: library, covers: covers) { newID in
+                // The album's id changes with its name; keep the open page pointing at it.
+                if app.route == .album(album.id) { app.replaceRoute(.album(newID)) }
+            }
+        }
+        .sheet(item: $app.trackBeingEdited) { track in
+            TrackEditorSheet(track: track, library: library, covers: covers)
         }
         .confirmationDialog(
             "Delete \u{201C}\(pendingDeletionName)\u{201D}?",

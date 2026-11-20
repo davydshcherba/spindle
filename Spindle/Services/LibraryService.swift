@@ -36,6 +36,8 @@ final class LibraryService {
     private struct ImportBatch {
         let urls: [URL]
         let skipDuplicates: Bool
+        /// When set, every song goes into this one album instead of the one its tags name.
+        let singleAlbum: String?
         let accesses: [SecurityScopedAccess]
 
         func stopAccessing() { accesses.forEach { $0.stop() } }
@@ -79,11 +81,12 @@ final class LibraryService {
     ///
     /// Security scope is opened right away, because URLs from drag-and-drop or an open
     /// panel are only reliably accessible for a limited time.
-    func importItems(_ urls: [URL], skipDuplicates: Bool = true) {
+    func importItems(_ urls: [URL], skipDuplicates: Bool = true, singleAlbum: String? = nil) {
         guard !urls.isEmpty else { return }
         pendingBatches.append(ImportBatch(
             urls: urls,
             skipDuplicates: skipDuplicates,
+            singleAlbum: singleAlbum,
             accesses: urls.map(SecurityScopedAccess.init(url:))
         ))
         if importSession == nil || importSession?.isFinished == true {
@@ -144,7 +147,9 @@ final class LibraryService {
                 session.setStatus(.failed(failure.reason), at: base + offset)
             case .success(let file):
                 let track = Track(
-                    title: file.title, artist: file.artist, albumArtist: file.albumArtist, album: file.album,
+                    title: file.title, artist: file.artist,
+                    albumArtist: batch.singleAlbum == nil ? file.albumArtist : LibraryDefaults.variousArtists,
+                    album: batch.singleAlbum ?? file.album,
                     year: file.year, trackNumber: file.trackNumber, discNumber: file.discNumber,
                     duration: file.duration, fileSize: file.fileSize, fileExtension: file.fileExtension,
                     filePath: file.path, bookmarkData: file.bookmark, artworkKey: file.artworkKey
@@ -194,9 +199,40 @@ final class LibraryService {
 
     // MARK: Editing tracks
 
-    func toggleFavorite(_ track: Track) {
-        track.isFavorite.toggle()
+    /// Changes what Spindle shows for a track. The audio file itself is never modified.
+    func update(_ track: Track, with edit: TrackEdit) {
+        track.title = edit.title
+        track.artist = edit.artist
+        track.albumArtist = edit.albumArtist
+        track.album = edit.album
+        track.year = edit.year
+        track.trackNumber = edit.trackNumber
+        if case .set(let key) = edit.cover { track.artworkKey = key }
         save()
+        revision += 1
+    }
+
+    /// Applies an album edit to every song in the album. Albums with the same name and album
+    /// artist are one album, so renaming an album to match another merges them.
+    func update(_ tracks: [Track], with edit: AlbumEdit) {
+        for track in tracks {
+            track.album = edit.title
+            track.albumArtist = edit.artist
+            if case .set(let year) = edit.year { track.year = year }
+            if case .set(let key) = edit.cover { track.artworkKey = key }
+        }
+        save()
+        revision += 1
+    }
+
+    /// Puts every song in one album, whatever its tags say. Artist names are kept.
+    func putAllInOneAlbum(named name: String = LibraryDefaults.songsAlbum) {
+        for track in tracks {
+            track.album = name
+            track.albumArtist = LibraryDefaults.variousArtists
+        }
+        save()
+        revision += 1
     }
 
     /// Called when a bookmark resolved as stale; the refreshed one keeps working.
@@ -236,6 +272,16 @@ final class LibraryService {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, trimmed != playlist.name else { return }
         playlist.name = trimmed
+        playlist.updatedAt = .now
+        save()
+        revision += 1
+    }
+
+    /// Saves a new name and/or cover picture together. A blank name keeps the old one.
+    func update(_ playlist: Playlist, name: String, cover: Change<String?>) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { playlist.name = trimmed }
+        if case .set(let key) = cover { playlist.coverKey = key }
         playlist.updatedAt = .now
         save()
         revision += 1

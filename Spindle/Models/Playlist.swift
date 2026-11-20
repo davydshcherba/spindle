@@ -15,6 +15,9 @@ final class Playlist {
     var updatedAt: Date
     var lastPlayedAt: Date?
     var trackIDs: [UUID]
+    /// Key into `ArtworkStore` for a picture the user chose. Nil means "automatic": a mosaic
+    /// of the covers of the songs inside.
+    var coverKey: String?
 
     init(
         id: UUID = UUID(),
@@ -28,5 +31,6 @@ final class Playlist {
         self.updatedAt = createdAt
         self.lastPlayedAt = nil
         self.trackIDs = trackIDs
+        self.coverKey = nil
     }
 }

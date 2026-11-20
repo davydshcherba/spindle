@@ -41,13 +41,6 @@ struct PlayerBar: View {
                         .foregroundStyle(Theme.muted)
                         .lineLimit(1)
                 }
-                let isFavorite = player.currentTrack?.isFavorite == true
-                IconButton(
-                    systemName: isFavorite ? "heart.fill" : "heart", size: 16,
-                    color: isFavorite ? Theme.accentLight : Theme.muted,
-                    hoverColor: Theme.accentLight,
-                    help: isFavorite ? "Remove from Liked" : "Add to Liked"
-                ) { player.toggleFavoriteOfCurrent() }
             } else {
                 Text("Nothing playing")
                     .font(.system(size: 14))

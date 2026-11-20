@@ -25,7 +25,6 @@ final class Track {
     /// Key into `ArtworkStore`; shared between tracks with identical cover art.
     var artworkKey: String?
     var dateAdded: Date
-    var isFavorite: Bool
 
     init(
         id: UUID = UUID(),
@@ -42,8 +41,7 @@ final class Track {
         filePath: String,
         bookmarkData: Data,
         artworkKey: String? = nil,
-        dateAdded: Date = .now,
-        isFavorite: Bool = false
+        dateAdded: Date = .now
     ) {
         self.id = id
         self.title = title
@@ -60,7 +58,6 @@ final class Track {
         self.bookmarkData = bookmarkData
         self.artworkKey = artworkKey
         self.dateAdded = dateAdded
-        self.isFavorite = isFavorite
     }
 }
 

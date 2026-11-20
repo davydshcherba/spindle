@@ -104,6 +104,27 @@ final class LibraryViewModel {
 
     func removeAllMusic() { remove(library.tracks) }
 
+    /// Saves edited info and refreshes anything already queued or playing.
+    func apply(_ edit: TrackEdit, to track: Track) {
+        library.update(track, with: edit)
+        player.updateItem(track.playerItem)
+    }
+
+    /// Saves an album edit for all its songs. Returns the album's id afterwards: it changes when
+    /// the name or album artist does, and equals another album's id when the two merge.
+    @discardableResult
+    func apply(_ edit: AlbumEdit, to album: Album) -> String {
+        library.update(album.tracks, with: edit)
+        player.updateItems(album.tracks.map(\.playerItem))
+        return Album.key(artist: edit.artist, title: edit.title)
+    }
+
+    /// Moves every song into the single "My songs" album.
+    func putAllSongsInOneAlbum() {
+        library.putAllInOneAlbum()
+        player.updateItems(library.tracks.map(\.playerItem))
+    }
+
     // MARK: Derivation
 
     private var query: String { searchText.trimmingCharacters(in: .whitespacesAndNewlines) }

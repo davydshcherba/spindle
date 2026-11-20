@@ -10,6 +10,7 @@ final class AppModel {
     let playlists: PlaylistsViewModel
     let player: PlayerViewModel
     let importer: ImportViewModel
+    let covers: CoverImporter
 
     init() throws {
         environment = try AppEnvironment.makeForCurrentProcess()
@@ -22,6 +23,7 @@ final class AppModel {
         let picker: any FilePicking = MacFilePicker()
         #endif
         importer = ImportViewModel(library: services.library, picker: picker, app: app, toasts: toasts)
+        covers = CoverImporter(picker: picker, artwork: services.artwork)
 
         #if DEBUG
         applyDebugLaunchOptions()
