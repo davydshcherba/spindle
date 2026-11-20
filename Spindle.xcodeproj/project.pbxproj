@@ -45,6 +45,7 @@
 		86A1C4EE0C8C4F936C16EA2D /* PlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BA59DA935107D84F5208D4 /* PlayerService.swift */; };
 		8D2590FD87AF6D5E3245D545 /* ImportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF6B24E3607F74BBA98F2CB /* ImportViewModel.swift */; };
 		8FF7EC64C3C11649AEF08677 /* MyMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D20EF49A8364488D2845EE /* MyMusicView.swift */; };
+		925E4F79941574295B191918 /* MenuBarPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9E4371A4D3FAC217A59B06 /* MenuBarPlayer.swift */; };
 		9407F8E941A1EA5A677F4E01 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53647EDE5B1020E073D8FB4 /* PlayerViewModel.swift */; };
 		9684744683BC85BB619AC96D /* AlbumPlaylistEditingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14569F1F6EB997A4B690D036 /* AlbumPlaylistEditingTests.swift */; };
 		9E45CDB3637887C26067E19E /* TrackEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444C0E4F9D65D1C767F21350 /* TrackEditorViewModel.swift */; };
@@ -141,6 +142,7 @@
 		C1032326252C4B55D68AE5D7 /* MetadataReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataReader.swift; sourceTree = "<group>"; };
 		C63DE0D0D333DD9614627885 /* AudioFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFormat.swift; sourceTree = "<group>"; };
 		C7C747C8ECCD4137559C0744 /* PlaylistsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsViewModel.swift; sourceTree = "<group>"; };
+		CC9E4371A4D3FAC217A59B06 /* MenuBarPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPlayer.swift; sourceTree = "<group>"; };
 		CD12E5239A55107A7CC27D95 /* DebugLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLaunch.swift; sourceTree = "<group>"; };
 		D395E9A208DA6BFEBA2290F3 /* SettingsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPopover.swift; sourceTree = "<group>"; };
 		D53647EDE5B1020E073D8FB4 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
@@ -242,6 +244,14 @@
 			path = MyMusic;
 			sourceTree = "<group>";
 		};
+		6702A64D38BBF7987822A013 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E4371A4D3FAC217A59B06 /* MenuBarPlayer.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
 		71B23AB458F9C03E74A53BB4 /* Playlists */ = {
 			isa = PBXGroup;
 			children = (
@@ -332,6 +342,7 @@
 				EB79BC71D931A38DF880F71D /* Albums */,
 				87D4CFEAC5B2DC9B0185CE01 /* Components */,
 				8F37A449FA61F1CA19CAC1C9 /* Detail */,
+				6702A64D38BBF7987822A013 /* MenuBar */,
 				65CED899D3359F1926C19194 /* MyMusic */,
 				A461FF855E167C859FD71192 /* Player */,
 				71B23AB458F9C03E74A53BB4 /* Playlists */,
@@ -515,6 +526,7 @@
 				45B99FE26B34A5DFEDF3AE9F /* ImportWorker.swift in Sources */,
 				A362B5993D66CEF02C384CB4 /* LibraryService.swift in Sources */,
 				1F381FC3D553E1C209BD6791 /* LibraryViewModel.swift in Sources */,
+				925E4F79941574295B191918 /* MenuBarPlayer.swift in Sources */,
 				B7377400C5AF7F1D7013E966 /* MetadataReader.swift in Sources */,
 				266D122F3D910E1961C1DC53 /* MissingItemView.swift in Sources */,
 				8FF7EC64C3C11649AEF08677 /* MyMusicView.swift in Sources */,

@@ -86,7 +86,7 @@ struct PlayerBar: View {
                 app.isQueueVisible = true
                 app.presentNowPlaying()
             }
-            IconButton(systemName: volumeSymbol, size: 16, help: player.isMuted ? "Unmute" : "Mute") {
+            IconButton(systemName: player.volumeSymbol, size: 16, help: player.isMuted ? "Unmute" : "Mute") {
                 player.toggleMute()
             }
             SeekBar(
@@ -99,15 +99,6 @@ struct PlayerBar: View {
                 onEnded: { player.volume = $0 }
             )
             .frame(width: 104)
-        }
-    }
-
-    private var volumeSymbol: String {
-        switch player.volume {
-        case 0: "speaker.slash.fill"
-        case ..<0.34: "speaker.wave.1.fill"
-        case ..<0.67: "speaker.wave.2.fill"
-        default: "speaker.wave.3.fill"
         }
     }
 }

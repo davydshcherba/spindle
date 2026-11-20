@@ -2,23 +2,19 @@ import SwiftUI
 
 @main
 struct SpindleApp: App {
+    static let mainWindowID = "main"
+
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     private let startup = Result { try AppModel() }
+    @AppStorage(MenuBarSettings.showKey) private var showInMenuBar = true
 
     var body: some Scene {
         // A single-window app: `Window` (unlike `WindowGroup`) has no "New Window" command,
         // so there is only ever one copy of the player state.
-        Window("Spindle", id: "main") {
+        Window("Spindle", id: Self.mainWindowID) {
             switch startup {
             case .success(let model):
-                RootView()
-                    .environment(model.app)
-                    .environment(model.library)
-                    .environment(model.playlists)
-                    .environment(model.player)
-                    .environment(model.importer)
-                    .environment(model.toasts)
-                    .environment(model.covers)
-                    .environment(\.artworkStore, model.artwork)
+                RootView().appEnvironment(model)
             case .failure(let error):
                 StartupErrorView(error: error)
             }
@@ -32,6 +28,42 @@ struct SpindleApp: App {
                 PlaybackCommands(model: model)
             }
         }
+
+        // A mini player in the menu bar, so playback can be controlled with the window closed.
+        // Turned off in Settings, or by ⌘-dragging the icon out of the menu bar.
+        MenuBarExtra(isInserted: menuBarIsInserted) {
+            if case .success(let model) = startup {
+                MenuBarPlayer().appEnvironment(model)
+            }
+        } label: {
+            MenuBarLabel()
+        }
+        .menuBarExtraStyle(.window)
+    }
+
+    /// Shown only when the library opened (there is nothing to control otherwise) and the user wants it.
+    private var menuBarIsInserted: Binding<Bool> {
+        Binding(
+            get: {
+                guard case .success = startup else { return false }
+                return showInMenuBar
+            },
+            set: { showInMenuBar = $0 }
+        )
+    }
+}
+
+private extension View {
+    /// Everything the app's views read from the environment.
+    func appEnvironment(_ model: AppModel) -> some View {
+        environment(model.app)
+            .environment(model.library)
+            .environment(model.playlists)
+            .environment(model.player)
+            .environment(model.importer)
+            .environment(model.toasts)
+            .environment(model.covers)
+            .environment(\.artworkStore, model.artwork)
     }
 }
 

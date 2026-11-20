@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsPopover: View {
     @Environment(LibraryViewModel.self) private var library
+    @AppStorage(MenuBarSettings.showKey) private var showInMenuBar = true
     @State private var isConfirmingRemoval = false
     @State private var isConfirmingOneAlbum = false
 
@@ -20,6 +21,16 @@ struct SettingsPopover: View {
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.muted)
             }
+
+            Divider().overlay(Theme.hairline)
+
+            Toggle(isOn: $showInMenuBar) {
+                Label("Show in menu bar", systemImage: "menubar.rectangle")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Theme.text)
+            }
+            .toggleStyle(.switch)
+            .tint(Theme.accent)
 
             Divider().overlay(Theme.hairline)
 

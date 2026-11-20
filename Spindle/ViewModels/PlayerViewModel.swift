@@ -94,6 +94,16 @@ final class PlayerViewModel {
 
     var isMuted: Bool { service.volume == 0 }
 
+    /// The speaker icon that matches the current volume.
+    var volumeSymbol: String {
+        switch volume {
+        case 0: "speaker.slash.fill"
+        case ..<0.34: "speaker.wave.1.fill"
+        case ..<0.67: "speaker.wave.2.fill"
+        default: "speaker.wave.3.fill"
+        }
+    }
+
     func toggleMute() {
         if isMuted {
             service.volume = volumeBeforeMute > 0 ? volumeBeforeMute : 0.7
