@@ -22,15 +22,10 @@ struct MyMusicView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("My Music")
-                .font(.system(size: 34, weight: .bold))
-                .tracking(-0.6)
-                .foregroundStyle(Theme.text)
-            Text(library.summary)
-                .font(.system(size: 14))
-                .foregroundStyle(Theme.muted)
-        }
+        Text("My Music")
+            .font(.system(size: 34, weight: .bold))
+            .tracking(-0.6)
+            .foregroundStyle(Theme.text)
     }
 
     @ViewBuilder private var controls: some View {

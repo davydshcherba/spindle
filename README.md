@@ -44,8 +44,8 @@ bought. Spindle is a calm, fast player for exactly that. Point it at a folder an
   queue (play next, add to queue, jump, remove).
 - **Edit anything** — songs, albums and playlists, including cover pictures. Rename an album to merge it with another,
   or put every song into one album. Your files are never modified.
-- **Liquid Glass** — floating glass bars, buttons and panels (macOS 26): the top bar and the player float over the
-  content, which scrolls underneath, and the backdrop picks up the colours of the cover that's playing.
+- **Liquid Glass** — glass bars, buttons and panels (macOS 26): the player bar floats over the content, which
+  scrolls underneath it, and the backdrop picks up the colours of the cover that's playing.
 - **Menu bar player** — a mini player in the menu bar with the cover, seek bar, transport and volume. While it is on,
   closing the window keeps the music playing; turn it off in Settings (the gear) if you'd rather not have it.
 - **Mac-native** — a *Playback* menu with Space, ⌘← and ⌘→, a single window, and a dark theme with a deliberate

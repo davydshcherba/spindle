@@ -144,9 +144,12 @@ struct NowPlayingView: View {
         .multilineTextAlignment(.center)
     }
 
-    /// The progress bar and times on their own glass card.
+    /// The progress bar on its own glass card, with the start time at its left end and the
+    /// end time at its right end.
     private var timeline: some View {
-        VStack(spacing: 2) {
+        HStack(spacing: 14) {
+            Text(player.elapsedText)
+                .frame(minWidth: 46, alignment: .trailing)
             SeekBar(
                 progress: player.progress,
                 thickness: 5,
@@ -157,17 +160,14 @@ struct NowPlayingView: View {
                 onEnded: { player.endScrub(at: $0) }
             )
             .animation(Motion.swap, value: player.currentItem?.id)
-            HStack {
-                Text(player.elapsedText)
-                Spacer()
-                Text(player.remainingText)
-            }
-            .font(.system(size: 12))
-            .monospacedDigit()
-            .foregroundStyle(Theme.text.opacity(0.65))
+            Text(player.remainingText)
+                .frame(minWidth: 46, alignment: .leading)
         }
+        .font(.system(size: 12))
+        .monospacedDigit()
+        .foregroundStyle(Theme.text.opacity(0.65))
         .padding(.horizontal, 24)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
         .frame(maxWidth: 720)
         .glassPanel(cornerRadius: 28)
         .padding(.horizontal, 40)

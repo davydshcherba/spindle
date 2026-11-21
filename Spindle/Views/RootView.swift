@@ -18,16 +18,23 @@ struct RootView: View {
         ZStack {
             AmbientBackground()
 
-            page
-                .id(app.route)
-                .transition(.opacity)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                // Floating Liquid Glass bars: the page scrolls underneath them.
-                .safeAreaBar(edge: .top, spacing: 0) { TopBar() }
-                .safeAreaBar(edge: .bottom, spacing: 0) { PlayerBar() }
-                // The title bar is hidden: let the top bar run underneath the traffic lights.
-                .ignoresSafeArea(.container, edges: .top)
-                .blur(radius: app.isAddMusicPresented ? 10 : 0)
+            VStack(spacing: 0) {
+                // The navigation bar sits above the page, not over it: content never scrolls
+                // underneath its buttons.
+                TopBar()
+
+                page
+                    .id(app.route)
+                    .transition(.opacity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    // The player bar floats: the page scrolls underneath it.
+                    .safeAreaBar(edge: .bottom, spacing: 0) { PlayerBar() }
+            }
+            // The title bar is hidden: let the top bar run underneath the traffic lights,
+            // and put the lights on the same line as the bar's buttons.
+            .ignoresSafeArea(.container, edges: .top)
+            .background(TrafficLightAlignment(centerFromTop: TopBar.centerFromTop))
+            .blur(radius: app.isAddMusicPresented ? 10 : 0)
 
             if app.isAddMusicPresented {
                 // A modal: fades in from a touch smaller. (Reduced motion: just the fade.)

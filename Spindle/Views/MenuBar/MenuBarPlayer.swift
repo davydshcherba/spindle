@@ -99,8 +99,11 @@ struct MenuBarPlayer: View {
 
     // MARK: Progress and volume
 
+    /// The bar with the start time at its left end and the song's length at its right end.
     private var progress: some View {
-        VStack(spacing: 2) {
+        HStack(spacing: 8) {
+            Text(player.elapsedText)
+                .frame(minWidth: 34, alignment: .trailing)
             SeekBar(
                 progress: player.progress,
                 isEnabled: player.hasItem,
@@ -110,15 +113,12 @@ struct MenuBarPlayer: View {
                 onEnded: { player.endScrub(at: $0) }
             )
             .animation(Motion.swap, value: player.currentItem?.id)
-            HStack {
-                Text(player.elapsedText)
-                Spacer()
-                Text(player.durationText)
-            }
-            .font(.system(size: 11))
-            .monospacedDigit()
-            .foregroundStyle(Theme.muted)
+            Text(player.durationText)
+                .frame(minWidth: 34, alignment: .leading)
         }
+        .font(.system(size: 11))
+        .monospacedDigit()
+        .foregroundStyle(Theme.muted)
     }
 
     private var volume: some View {

@@ -77,6 +77,7 @@
 		EE438CDF134340258517CE30 /* VinylDisc.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3ACB5397BE156CDDF5C6C97 /* VinylDisc.swift */; };
 		EE7FA01F18F97F2B537FB532 /* ToastCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A3AA047F80AEE11C725ED9 /* ToastCenter.swift */; };
 		F18BDA31B4E22BF230ACA9CE /* QueuePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 979C28CB9F81B0CAAAFD18B4 /* QueuePanel.swift */; };
+		F2889FE683C82FF83F6B786A /* WindowChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49348C1171E7980EEF7BF56F /* WindowChrome.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +108,7 @@
 		3BB11D4E5613EF37960B0293 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
 		40D3DC3EF6E3937BEF6EB018 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		444C0E4F9D65D1C767F21350 /* TrackEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEditorViewModel.swift; sourceTree = "<group>"; };
+		49348C1171E7980EEF7BF56F /* WindowChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowChrome.swift; sourceTree = "<group>"; };
 		4B80C9A6E7833F853B208D53 /* SpindleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpindleApp.swift; sourceTree = "<group>"; };
 		5BC8CC0D25C88E99D8446E54 /* ImportWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportWorker.swift; sourceTree = "<group>"; };
 		624A7B7697BC8103728EC2B2 /* PlayerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerServiceTests.swift; sourceTree = "<group>"; };
@@ -358,6 +360,7 @@
 			isa = PBXGroup;
 			children = (
 				BFB5E7AF97723AF38E1D4E48 /* FilePicker.swift */,
+				49348C1171E7980EEF7BF56F /* WindowChrome.swift */,
 			);
 			path = Platform;
 			sourceTree = "<group>";
@@ -563,6 +566,7 @@
 				E67AAA3699A08766AD17C856 /* TrackListView.swift in Sources */,
 				6F4A047CD4DA4A1E2128185E /* TrackMetadata.swift in Sources */,
 				EE438CDF134340258517CE30 /* VinylDisc.swift in Sources */,
+				F2889FE683C82FF83F6B786A /* WindowChrome.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

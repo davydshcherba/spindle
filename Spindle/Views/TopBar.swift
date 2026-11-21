@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The window's only chrome: floating Liquid Glass pills for navigation, tabs, search, Add and
-/// settings. Content scrolls underneath them. No sidebar.
+/// The window's only chrome: Liquid Glass pills for navigation, tabs, search, Add and settings.
+/// It sits above the page, so content never scrolls underneath it. No sidebar.
 struct TopBar: View {
     @Environment(AppViewModel.self) private var app
     @Environment(LibraryViewModel.self) private var library
@@ -10,6 +10,9 @@ struct TopBar: View {
     /// Space reserved for the traffic-light buttons, which float over the hidden title bar.
     private static let trafficLightInset: CGFloat = 70
     private static let height: CGFloat = 44
+    private static let verticalPadding: CGFloat = 8
+    /// Distance from the window's top edge to the middle of the pills; the traffic lights line up with it.
+    static let centerFromTop = verticalPadding + height / 2
 
     var body: some View {
         @Bindable var library = library
@@ -46,7 +49,7 @@ struct TopBar: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, Self.verticalPadding)
         .onChange(of: library.searchText) { _, text in
             // Searching always happens in My Music.
             if !text.isEmpty, app.route != .myMusic { app.navigate(to: .myMusic) }
