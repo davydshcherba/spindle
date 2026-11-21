@@ -7,7 +7,7 @@ struct SettingsPopover: View {
     @State private var isConfirmingOneAlbum = false
 
     private var versionText: String {
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.0"
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.2.0"
         return "Spindle \(version)"
     }
 
