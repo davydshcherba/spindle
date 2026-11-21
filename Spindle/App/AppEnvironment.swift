@@ -9,6 +9,9 @@ final class AppEnvironment {
     let equalizer: Equalizer
     let player: PlayerService
     let nowPlaying: NowPlayingService
+    #if os(iOS)
+    let audioSession: AudioSessionHandler
+    #endif
 
     init(
         inMemory: Bool = false,
@@ -24,6 +27,9 @@ final class AppEnvironment {
         equalizer = Equalizer(defaults: defaults)
         player = PlayerService(defaults: defaults, equalizer: equalizer.parameters)
         nowPlaying = NowPlayingService(player: player, artwork: artwork)
+        #if os(iOS)
+        audioSession = AudioSessionHandler(player: player)
+        #endif
 
         let library = library
         player.onBookmarkRefreshed = { id, data in library.updateBookmark(forTrackWithID: id, to: data) }

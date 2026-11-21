@@ -53,21 +53,6 @@ struct SpindleApp: App {
     }
 }
 
-private extension View {
-    /// Everything the app's views read from the environment.
-    func appEnvironment(_ model: AppModel) -> some View {
-        environment(model.app)
-            .environment(model.library)
-            .environment(model.playlists)
-            .environment(model.player)
-            .environment(model.importer)
-            .environment(model.toasts)
-            .environment(model.covers)
-            .environment(model.equalizer)
-            .environment(\.artworkStore, model.artwork)
-    }
-}
-
 /// Keyboard-driven playback, in the standard places for a Mac music player.
 struct PlaybackCommands: Commands {
     let model: AppModel

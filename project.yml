@@ -2,8 +2,9 @@ name: Spindle
 options:
   bundleIdPrefix: com.spindle
   deploymentTarget:
-    # Liquid Glass (glassEffect, GlassEffectContainer, safeAreaBar) needs macOS 26.
+    # Liquid Glass (glassEffect, GlassEffectContainer, safeAreaBar) needs macOS 26 / iOS 26.
     macOS: "26.0"
+    iOS: "26.0"
   developmentLanguage: en
   createIntermediateGroups: true
   generateEmptyDirectories: true
@@ -40,6 +41,58 @@ targets:
         ENABLE_HARDENED_RUNTIME: YES
         COMBINE_HIDPI_IMAGES: YES
 
+  # The iPhone app. It shares the models, services and view models with the Mac app, and the few
+  # views that don't depend on AppKit; its own screens live in SpindleiOS/.
+  SpindleiOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Spindle/Models
+      - path: Spindle/Services
+      - path: Spindle/ViewModels
+      - path: Spindle/Platform
+        excludes:
+          - WindowChrome.swift
+      - path: Spindle/App
+        excludes:
+          - SpindleApp.swift
+      - path: Spindle/Views/Theme.swift
+      - path: Spindle/Views/Components/ArtworkView.swift
+      - path: Spindle/Views/Components/AmbientBackground.swift
+      - path: Spindle/Views/Components/Controls.swift
+      - path: Spindle/Views/Components/Motion.swift
+      - path: Spindle/Views/Components/SeekBar.swift
+      - path: Spindle/Views/Components/VinylDisc.swift
+      - path: Spindle/Views/Player/PlayPauseButton.swift
+      - path: SpindleiOS
+    info:
+      path: SpindleiOS/Info.plist
+      properties:
+        CFBundleDisplayName: Spindle
+        LSApplicationCategoryType: public.app-category.music
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        # Keeps the music playing with the screen off.
+        UIBackgroundModes:
+          - audio
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIUserInterfaceStyle: Dark
+        # Songs dropped into the Spindle folder in the Files app, and "Open in Spindle".
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_NAME: Spindle
+        # The same id as the Mac app, so one purchase could cover both.
+        PRODUCT_BUNDLE_IDENTIFIER: com.spindle.Spindle
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
   SpindleTests:
     type: bundle.unit-test
     platform: macOS
@@ -64,3 +117,10 @@ schemes:
       config: Debug
       targets:
         - SpindleTests
+
+  SpindleiOS:
+    build:
+      targets:
+        SpindleiOS: all
+    run:
+      config: Debug
