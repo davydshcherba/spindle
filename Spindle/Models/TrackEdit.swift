@@ -37,8 +37,7 @@ nonisolated struct TrackEdit: Equatable, Sendable {
     ) -> Result<TrackEdit, Problem> {
         guard let title = nonEmpty(title) else { return .failure(.emptyTitle) }
         let artist = nonEmpty(artist) ?? UnknownTag.artist
-        let album = nonEmpty(album) ?? UnknownTag.album
-        let albumArtist = nonEmpty(albumArtist) ?? artist
+        let (album, albumArtist) = albumIdentity(album: album, artist: artist, albumArtist: albumArtist)
 
         var yearValue: Int?
         if let text = nonEmpty(year) {
@@ -56,6 +55,14 @@ nonisolated struct TrackEdit: Equatable, Sendable {
             title: title, artist: artist, albumArtist: albumArtist, album: album,
             year: yearValue, trackNumber: trackValue, cover: cover
         ))
+    }
+
+    /// The album a song belongs to, from the text typed in an editor. An album is told apart by
+    /// its artist as well as its title, so both matter. A blank title means "Unknown Album", and a
+    /// blank album artist follows the song's artist.
+    static func albumIdentity(album: String, artist: String, albumArtist: String) -> (title: String, artist: String) {
+        let artist = nonEmpty(artist) ?? UnknownTag.artist
+        return (nonEmpty(album) ?? UnknownTag.album, nonEmpty(albumArtist) ?? artist)
     }
 
     private static func nonEmpty(_ text: String) -> String? {

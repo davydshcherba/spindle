@@ -129,7 +129,8 @@ final class LibraryViewModel {
 
     private var query: String { searchText.trimmingCharacters(in: .whitespacesAndNewlines) }
 
-    private var allAlbums: [Album] {
+    /// Every album in the library, whatever the filter or search: what the song editor offers.
+    var allAlbums: [Album] {
         if let cached = allAlbumsCache, cached.revision == library.revision { return cached.value }
         let value = Album.group(library.tracks)
         allAlbumsCache = (library.revision, value)

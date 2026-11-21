@@ -42,7 +42,8 @@ bought. Spindle is a calm, fast player for exactly that. Point it at a folder an
   work too.
 - **Now Playing** — a full page with a large cover and a background tinted by the cover's dominant colour, plus a play
   queue (play next, add to queue, jump, remove).
-- **Edit anything** — songs, albums and playlists, including cover pictures. Rename an album to merge it with another,
+- **Edit anything** — songs, albums and playlists, including cover pictures. In a song's info, pick an album you
+  already have (it brings its artist along) or type a name to start a new one. Rename an album to merge it with another,
   or put every song into one album. Your files are never modified.
 - **Equalizer** — ten bands from 31 Hz to 16 kHz, ±12 dB each, with twelve presets (Rock, Vocal, Bass Booster…).
   Open it from the slider icon in the player bar or the *Equalizer* button in Now Playing; changes are heard at once

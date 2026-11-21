@@ -72,6 +72,79 @@ final class TrackEditorViewModel {
         return false
     }
 
+    // MARK: Album
+
+    /// An album that is already in the library, as offered by the Album field. An album is told
+    /// apart by its artist as well as its title: two "Greatest Hits" are two separate choices.
+    struct AlbumChoice: Identifiable, Equatable {
+        /// `Album.key` of the album.
+        let id: String
+        let title: String
+        let artist: String
+        let trackCount: Int
+        let artworkKey: String?
+
+        init(_ album: Album) {
+            id = album.id
+            title = album.title
+            artist = album.artist
+            trackCount = album.tracks.count
+            artworkKey = album.artworkKey
+        }
+
+        /// "Maren Volk · 2 songs"
+        var detail: String { "\(artist) \u{00B7} \(TimeFormat.count(trackCount, "song"))" }
+    }
+
+    /// What saving would do with the song's album.
+    enum AlbumOutcome: Equatable {
+        /// The song stays where it is.
+        case stays(AlbumChoice)
+        /// The song joins an album that already exists.
+        case joins(AlbumChoice)
+        /// Nothing matches (title and artist), so saving creates a new album.
+        case creates(title: String, artist: String)
+    }
+
+    /// Existing albums to pick from. With `filteredByTyping`, only those whose title or artist
+    /// contains what's typed in the Album field (titles that start with it first); otherwise all
+    /// of them. Alphabetical within each group.
+    func albumChoices(filteredByTyping: Bool) -> [AlbumChoice] {
+        let query = filteredByTyping ? album.trimmingCharacters(in: .whitespacesAndNewlines) : ""
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        func startsWithQuery(_ choice: AlbumChoice) -> Bool {
+            !query.isEmpty && choice.title.range(of: query, options: options.union(.anchored)) != nil
+        }
+        let matching = library.allAlbums.map(AlbumChoice.init).filter { choice in
+            query.isEmpty
+                || choice.title.range(of: query, options: options) != nil
+                || choice.artist.range(of: query, options: options) != nil
+        }
+        return matching.sorted { first, second in
+            let (firstStarts, secondStarts) = (startsWithQuery(first), startsWithQuery(second))
+            if firstStarts != secondStarts { return firstStarts }
+            let order = first.title.localizedStandardCompare(second.title)
+            if order != .orderedSame { return order == .orderedAscending }
+            return first.artist.localizedStandardCompare(second.artist) == .orderedAscending
+        }
+    }
+
+    /// Puts the song into an existing album: its title and, just as important, its artist.
+    func choose(_ choice: AlbumChoice) {
+        // A blank title is how "Unknown Album" is written in the field.
+        album = choice.title == UnknownTag.album ? "" : choice.title
+        albumArtist = choice.artist
+    }
+
+    var albumOutcome: AlbumOutcome {
+        let identity = TrackEdit.albumIdentity(album: album, artist: artist, albumArtist: albumArtist)
+        let key = Album.key(artist: identity.artist, title: identity.title)
+        guard let existing = library.allAlbums.first(where: { $0.id == key }) else {
+            return .creates(title: identity.title, artist: identity.artist)
+        }
+        return key == track.albumKey ? .stays(AlbumChoice(existing)) : .joins(AlbumChoice(existing))
+    }
+
     func chooseCover() async {
         switch await covers.choose() {
         case .chosen(let key):

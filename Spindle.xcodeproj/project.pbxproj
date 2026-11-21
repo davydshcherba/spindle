@@ -20,6 +20,7 @@
 		2E446EA58EC60211663B9920 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 905BDF3E21D7974882366907 /* Playlist.swift */; };
 		2EA880F59F67B9141C0344DC /* SettingsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395E9A208DA6BFEBA2290F3 /* SettingsPopover.swift */; };
 		2F01A11AFD58237F63E0323A /* CoverEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 972FB208C35CCAE11B4331E0 /* CoverEditor.swift */; };
+		306B90939158746845B491CC /* TrackEditorAlbumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAE177F3EA2EA8F19A10183 /* TrackEditorAlbumTests.swift */; };
 		3244F84296B5C2707CFF295D /* TopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3B38E21D8D3284FB5012D97 /* TopBar.swift */; };
 		341CC8C13AD68F269A10C901 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1F66931C7A56D9994E78FF /* NowPlayingService.swift */; };
 		3493D8B14931EAF3FCD38516 /* DetailPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D274EA2608526E49B58071 /* DetailPages.swift */; };
@@ -158,6 +159,7 @@
 		C7C747C8ECCD4137559C0744 /* PlaylistsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsViewModel.swift; sourceTree = "<group>"; };
 		CC9E4371A4D3FAC217A59B06 /* MenuBarPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPlayer.swift; sourceTree = "<group>"; };
 		CD12E5239A55107A7CC27D95 /* DebugLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLaunch.swift; sourceTree = "<group>"; };
+		CFAE177F3EA2EA8F19A10183 /* TrackEditorAlbumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackEditorAlbumTests.swift; sourceTree = "<group>"; };
 		D28CF34372E208FFCAB8527D /* Equalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equalizer.swift; sourceTree = "<group>"; };
 		D395E9A208DA6BFEBA2290F3 /* SettingsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPopover.swift; sourceTree = "<group>"; };
 		D53647EDE5B1020E073D8FB4 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 				85CFD9851149065BB9DE4C45 /* LibraryServiceTests.swift */,
 				7367DA2EB95FCDDE76894460 /* MetadataReaderTests.swift */,
 				624A7B7697BC8103728EC2B2 /* PlayerServiceTests.swift */,
+				CFAE177F3EA2EA8F19A10183 /* TrackEditorAlbumTests.swift */,
 				771244F755BCD2786BD6EB7B /* TrackEditTests.swift */,
 				E75D004AE2FEE5097160308F /* ViewModelTests.swift */,
 			);
@@ -516,6 +519,7 @@
 				40C2730DEAC44A772D82FA1F /* MetadataReaderTests.swift in Sources */,
 				BB30B2A90BC3962CE0AC573B /* PlayerServiceTests.swift in Sources */,
 				E95C69CAA4D16E614B2AAA0E /* TrackEditTests.swift in Sources */,
+				306B90939158746845B491CC /* TrackEditorAlbumTests.swift in Sources */,
 				D5F6EC19829BB1765A82E1AC /* ViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
