@@ -31,4 +31,5 @@ final class AppModel {
     }
 
     var artwork: ArtworkStore { environment.artwork }
+    var equalizer: Equalizer { environment.equalizer }
 }

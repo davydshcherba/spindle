@@ -10,7 +10,7 @@ nonisolated enum PlayerEvent: Sendable, Equatable {
     case queueChanged
 }
 
-/// Plays a queue of tracks with AVPlayer.
+/// Plays a queue of tracks with AVPlayer, through the equalizer.
 ///
 /// Knows nothing about SwiftData or SwiftUI: it is handed `PlayerItem`s and
 /// resolves their security-scoped bookmarks itself. State is `@Observable` for
@@ -76,6 +76,7 @@ final class PlayerService {
     private static let restartThreshold: TimeInterval = 3
 
     @ObservationIgnored private let player = AVPlayer()
+    @ObservationIgnored private let equalizer: EqualizerParameters
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let log = Logger(subsystem: "com.spindle.Spindle", category: "Player")
     @ObservationIgnored private var originalOrder: [QueueEntry] = []
@@ -87,8 +88,11 @@ final class PlayerService {
     @ObservationIgnored private var consecutiveFailures = 0
     @ObservationIgnored private var handlers: [(PlayerEvent) -> Void] = []
 
-    init(defaults: UserDefaults = .standard) {
+    /// `equalizer` holds the settings the music is run through; the default is a flat one that
+    /// nobody changes.
+    init(defaults: UserDefaults = .standard, equalizer: EqualizerParameters = EqualizerParameters()) {
         self.defaults = defaults
+        self.equalizer = equalizer
         self.volume = defaults.object(forKey: Keys.volume) as? Float ?? 0.7
         self.isShuffled = defaults.bool(forKey: Keys.shuffle)
         self.repeatMode = defaults.string(forKey: Keys.repeatMode).flatMap(RepeatMode.init(rawValue:)) ?? .off
@@ -309,11 +313,22 @@ final class PlayerService {
         let item = AVPlayerItem(url: url)
         attachObservers(to: item, entry: entry)
         player.replaceCurrentItem(with: item)
-        if autoplay {
-            player.play()
-            setPlaying(true)
-        }
+        if autoplay { setPlaying(true) }
+        attachEqualizer(to: item, startPlaying: autoplay)
         emit(.itemChanged)
+    }
+
+    /// Runs the track through the equalizer. Playback starts once that's in place, a moment
+    /// later, so the first notes are never heard flat.
+    private func attachEqualizer(to item: AVPlayerItem, startPlaying: Bool) {
+        let parameters = equalizer
+        Task { [weak self] in
+            let mix = await EqualizerTap.audioMix(for: item.asset, parameters: parameters)
+            // The track may have been skipped, or playback paused, while the mix was loading.
+            guard let self, player.currentItem === item else { return }
+            item.audioMix = mix
+            if startPlaying, isPlaying { player.play() }
+        }
     }
 
     private func attachObservers(to item: AVPlayerItem, entry: QueueEntry) {

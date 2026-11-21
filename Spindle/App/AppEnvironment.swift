@@ -6,6 +6,7 @@ final class AppEnvironment {
     let container: ModelContainer
     let artwork: ArtworkStore
     let library: LibraryService
+    let equalizer: Equalizer
     let player: PlayerService
     let nowPlaying: NowPlayingService
 
@@ -20,7 +21,8 @@ final class AppEnvironment {
 
         artwork = ArtworkStore(directory: artworkDirectory)
         library = LibraryService(modelContext: container.mainContext, artwork: artwork)
-        player = PlayerService(defaults: defaults)
+        equalizer = Equalizer(defaults: defaults)
+        player = PlayerService(defaults: defaults, equalizer: equalizer.parameters)
         nowPlaying = NowPlayingService(player: player, artwork: artwork)
 
         let library = library
