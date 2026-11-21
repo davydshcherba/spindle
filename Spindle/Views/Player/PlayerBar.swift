@@ -5,6 +5,8 @@ import SwiftUI
 struct PlayerBar: View {
     @Environment(PlayerViewModel.self) private var player
     @Environment(AppViewModel.self) private var app
+    @Environment(Equalizer.self) private var equalizer
+    @State private var isEqualizerPresented = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -92,6 +94,12 @@ struct PlayerBar: View {
 
     private var extras: some View {
         HStack(spacing: 6) {
+            // Lit while the equalizer is changing the sound.
+            IconButton(
+                systemName: "slider.vertical.3", size: 16,
+                color: equalizer.isShapingSound ? Theme.accentLight : Theme.muted, help: "Equalizer"
+            ) { isEqualizerPresented.toggle() }
+            .popover(isPresented: $isEqualizerPresented, arrowEdge: .top) { EqualizerPanel() }
             IconButton(systemName: "list.bullet", size: 16, help: "Queue", isEnabled: player.hasItem) {
                 app.isQueueVisible = true
                 app.presentNowPlaying()

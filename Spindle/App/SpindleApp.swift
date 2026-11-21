@@ -63,6 +63,7 @@ private extension View {
             .environment(model.importer)
             .environment(model.toasts)
             .environment(model.covers)
+            .environment(model.equalizer)
             .environment(\.artworkStore, model.artwork)
     }
 }

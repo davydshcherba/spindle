@@ -5,7 +5,9 @@ import SwiftUI
 struct NowPlayingView: View {
     @Environment(PlayerViewModel.self) private var player
     @Environment(AppViewModel.self) private var app
+    @Environment(Equalizer.self) private var equalizer
     @State private var isPickerPresented = false
+    @State private var isEqualizerPresented = false
 
     var body: some View {
         ZStack {
@@ -189,6 +191,11 @@ struct NowPlayingView: View {
                 LabelButton(title: "Queue", systemImage: "list.bullet", isActive: app.isQueueVisible) {
                     app.isQueueVisible.toggle()
                 }
+
+                LabelButton(title: "Equalizer", systemImage: "slider.vertical.3", isActive: equalizer.isShapingSound) {
+                    isEqualizerPresented = true
+                }
+                .popover(isPresented: $isEqualizerPresented, arrowEdge: .top) { EqualizerPanel() }
 
                 Spacer()
 

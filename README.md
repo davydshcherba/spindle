@@ -44,6 +44,9 @@ bought. Spindle is a calm, fast player for exactly that. Point it at a folder an
   queue (play next, add to queue, jump, remove).
 - **Edit anything** — songs, albums and playlists, including cover pictures. Rename an album to merge it with another,
   or put every song into one album. Your files are never modified.
+- **Equalizer** — ten bands from 31 Hz to 16 kHz, ±12 dB each, with twelve presets (Rock, Vocal, Bass Booster…).
+  Open it from the slider icon in the player bar or the *Equalizer* button in Now Playing; changes are heard at once
+  and remembered between launches.
 - **Liquid Glass** — glass bars, buttons and panels (macOS 26): the player bar floats over the content, which
   scrolls underneath it, and the backdrop picks up the colours of the cover that's playing.
 - **Menu bar player** — a mini player in the menu bar with the cover, seek bar, transport and volume. While it is on,
