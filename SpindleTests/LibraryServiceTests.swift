@@ -196,6 +196,64 @@ struct LibraryServiceTests {
         #expect(!track.bookmarkData.isEmpty, "the pointer is kept so a later launch can try again")
     }
 
+    @Test func addingTheSongAgainRepairsAnOlderSongWhoseOriginalWasDeleted() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        try insertLegacyTrack(in: harness, original: urls[0])
+        try FileManager.default.removeItem(at: urls[0])
+        await harness.library.migrateLegacyTracks()
+        let before = try #require(harness.library.tracks.first)
+        #expect(before.libraryFileName == nil, "nothing to copy: the original is gone")
+        let playlist = harness.library.createPlaylist(named: "Mine", adding: [before.id])
+
+        // The file comes back (restored from a backup) and is added again.
+        let restored = try harness.makePlainTracks(count: 1)
+        await harness.importAndWait(restored)
+
+        #expect(harness.library.tracks.count == 1, "the song is repaired, not added a second time")
+        let after = try #require(harness.library.tracks.first)
+        #expect(after.id == before.id)
+        let name = try #require(after.libraryFileName)
+        #expect(harness.files.exists(name))
+        #expect(after.bookmarkData.isEmpty)
+        #expect(after.album == "Old Album", "what the library knew about the song is kept")
+        #expect(playlist.trackIDs == [before.id], "and so is its place in the playlist")
+    }
+
+    @Test func addingTheSongAgainRepairsASongWhoseCopyWasLost() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        await harness.importAndWait(urls)
+        let before = try #require(harness.library.tracks.first)
+        let lostName = try #require(before.libraryFileName)
+        harness.files.remove(lostName)
+        #expect(!harness.files.exists(lostName))
+
+        await harness.importAndWait(urls)
+
+        #expect(harness.library.tracks.count == 1)
+        let after = try #require(harness.library.tracks.first)
+        #expect(after.id == before.id)
+        let name = try #require(after.libraryFileName)
+        #expect(harness.files.exists(name), "the song plays again")
+    }
+
+    @Test func aSongThatStillPlaysIsStillSkippedAsADuplicate() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        await harness.importAndWait(urls)
+        let name = try #require(harness.library.tracks.first?.libraryFileName)
+
+        await harness.importAndWait(urls)
+
+        #expect(harness.library.tracks.count == 1)
+        #expect(harness.library.tracks.first?.libraryFileName == name, "the working copy is left alone")
+        #expect(try FileManager.default.contentsOfDirectory(atPath: harness.files.directory.path).count == 1)
+    }
+
     @Test func libraryLoadsAgainOnNextLaunchWithoutReimporting() async throws {
         let harness = try LibraryHarness()
         defer { harness.cleanUp() }

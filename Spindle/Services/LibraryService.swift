@@ -128,8 +128,14 @@ final class LibraryService {
         let files = await worker.collectAudioFiles(in: batch.urls)
         let base = session.begin(files: files)
 
-        var knownPaths = Set(tracks.map(\.filePath))
-        var knownKeys = Set(tracks.map(\.contentKey))
+        // A song with no copy to play can't stand in for a file being added: its original is gone and
+        // it never got a copy of its own. Adding the same song again repairs it instead of being
+        // skipped as a duplicate of something that no longer plays.
+        var broken = tracks.filter { !hasCopy($0) }
+        let healthy = tracks.filter(hasCopy)
+        var knownPaths = Set(healthy.map(\.filePath))
+        var knownKeys = Set(healthy.map(\.contentKey))
+        var repairedAny = false
         var inserted: [Track] = []
         let flushThreshold = 25
         let concurrency = 4
@@ -156,6 +162,23 @@ final class LibraryService {
                     duration: file.duration, fileSize: file.fileSize, fileExtension: file.fileExtension,
                     filePath: file.path, libraryFileName: file.libraryFileName, artworkKey: file.artworkKey
                 )
+                if batch.skipDuplicates,
+                   let index = broken.firstIndex(where: { $0.filePath == track.filePath || $0.contentKey == track.contentKey }) {
+                    // Same song as one the library lost: give that song the new copy. Its title,
+                    // album, cover, playlists and place in the queue stay as they were.
+                    let old = broken.remove(at: index)
+                    old.libraryFileName = file.libraryFileName
+                    old.bookmarkData = Data()
+                    old.filePath = file.path
+                    old.fileSize = file.fileSize
+                    old.fileExtension = file.fileExtension
+                    old.duration = file.duration
+                    knownPaths.insert(old.filePath)
+                    knownKeys.insert(old.contentKey)
+                    repairedAny = true
+                    session.setStatus(.added, at: base + offset)
+                    return
+                }
                 if batch.skipDuplicates, knownPaths.contains(track.filePath) || knownKeys.contains(track.contentKey) {
                     // The same recording under another name: don't keep a second copy of it.
                     self.files.remove(file.libraryFileName)
@@ -194,6 +217,16 @@ final class LibraryService {
             }
         }
         flush()
+        if repairedAny {
+            save()
+            revision += 1
+        }
+    }
+
+    /// Whether the song has a copy in the library folder that can be played.
+    private func hasCopy(_ track: Track) -> Bool {
+        guard let name = track.libraryFileName else { return false }
+        return files.exists(name)
     }
 
     private static func describe(_ urls: [URL]) -> String {

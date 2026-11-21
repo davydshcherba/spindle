@@ -134,7 +134,12 @@ costs no extra space), next to the library database and the cover-art cache. Aft
 move it, rename it or delete it and the song still plays.
 
 Removing a song from Spindle deletes Spindle's copy, never the original you added. Libraries made by an earlier
-version are copied into the folder automatically the first time you open the app.
+version are copied into the folder automatically the first time you open the app, as long as the originals are still
+where they were.
+
+If a song from an earlier version lost its original before it was copied (it says "The file was moved or deleted"),
+add the file again from wherever you have it: Spindle gives the existing song the new copy, so its title, album and
+playlists stay as they were instead of being skipped as a duplicate.
 
 ## Editing without touching your files
 
