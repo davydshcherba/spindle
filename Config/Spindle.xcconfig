@@ -1,0 +1,12 @@
+// Build settings for the iPhone app that are meant to be tuned per machine.
+//
+// To run on your own iPhone, copy Local.xcconfig.example to Local.xcconfig (it is not in git)
+// and fill in your Apple developer team. Nothing personal belongs in this file.
+
+// A free Apple ID needs a bundle id nobody else has used: override it in Local.xcconfig.
+PRODUCT_BUNDLE_IDENTIFIER = com.spindle.Spindle
+
+// Real devices are signed with a development certificate; the simulator needs none.
+CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Development
+
+#include? "Local.xcconfig"

@@ -115,6 +115,17 @@ Applications. It needs Xcode's command line tools and `python3`; the first run i
 [dmgbuild](https://github.com/dmgbuild/dmgbuild) into `.build/dmg/venv`. The picture is drawn by
 [`background.swift`](Scripts/dmg/background.swift) and the window layout lives in [`settings.py`](Scripts/dmg/settings.py).
 
+### Run it on an iPhone
+
+Open `Spindle.xcodeproj`, pick the **SpindleiOS** scheme and an iPhone simulator (iOS 26.1+), and press ⌘R. For a
+real iPhone you need an Apple ID added in Xcode's Settings → Accounts, and Developer Mode turned on in the phone
+(Settings → Privacy & Security). Then copy `Config/Local.xcconfig.example` to `Config/Local.xcconfig` (it is not in
+git) and put your team ID in it; if Xcode says the bundle identifier is taken, set your own there too.
+
+The iPhone app has its own screens in [`SpindleiOS/`](SpindleiOS/) and shares the models, services, editors and the
+equalizer with the Mac app. To try it with a folder of songs, add `SPINDLE_SEED_DIR=/path/to/songs` to the scheme's
+environment variables (Debug builds import it once, while the library is empty).
+
 ### Where do my songs live?
 
 In Spindle's own folder — you don't have to manage it. When you add a song, Spindle copies it into
@@ -184,7 +195,8 @@ Debug builds also understand a few launch variables for setting up a screen quic
 
 Ideas, not promises:
 
-- [ ] iPhone app, reusing the models, services and view models
+- [ ] iPhone app (in progress on the `ios` branch: library, albums, artists, playlists, player, queue, editing and the
+      equalizer are in; it hasn't been run on a real phone yet)
 - [ ] The turntable “vinyl” Now Playing from the design
 - [ ] Gapless playback
 - [ ] Light theme

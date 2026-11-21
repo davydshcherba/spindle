@@ -71,7 +71,7 @@ struct AlbumEditorSheet: View {
             }
         }
         .padding(24)
-        .frame(width: 480)
+        .sheetContentWidth(480)
         .preferredColorScheme(.dark)
         .onAppear { isTitleFocused = true }
     }

@@ -1,41 +1,33 @@
 import SwiftUI
 
-/// The iPhone app's first screen: your songs, search, a mini player at the bottom and the full
-/// player on top of it.
+/// The iPhone app: two tabs (My Music, Playlists), the mini player above the tab bar, and the
+/// full player, editors and import progress as sheets over them.
 struct PhoneRootView: View {
     @Environment(AppViewModel.self) private var app
-    @Environment(LibraryViewModel.self) private var library
     @Environment(PlayerViewModel.self) private var player
-    @Environment(ImportViewModel.self) private var importer
     @Environment(ToastCenter.self) private var toasts
+    @State private var navigator = PhoneNavigator()
 
     var body: some View {
-        @Bindable var app = app
-        @Bindable var library = library
+        @Bindable var navigator = navigator
 
-        NavigationStack {
-            content
-                // The navigation stack paints its own backdrop; this swaps it for Spindle's.
-                .containerBackground(for: .navigation) { AmbientBackground() }
-                .navigationTitle("My Music")
-                // At the top (pull the list down), so the bottom is free for the mini player.
-                .searchable(
-                    text: $library.searchText,
-                    placement: .navigationBarDrawer(displayMode: .automatic),
-                    prompt: "Songs, albums, artists"
-                )
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) { addMenu }
-                }
+        TabView(selection: $navigator.tab) {
+            // `SwiftUI.Tab`: the app already has its own `Tab` (for the Mac's navigation).
+            SwiftUI.Tab("My Music", systemImage: "music.quarternote.3", value: PhoneNavigator.Tab.library) {
+                PhoneLibraryView()
+            }
+            SwiftUI.Tab("Playlists", systemImage: "music.note.list", value: PhoneNavigator.Tab.playlists) {
+                PhonePlaylistsView()
+            }
         }
-        // The mini player floats above the home indicator; the list scrolls underneath it.
-        .safeAreaInset(edge: .bottom, spacing: 0) { PhoneMiniPlayer() }
-        .sheet(isPresented: $app.isNowPlayingPresented) { PhoneNowPlayingView() }
-        .sheet(isPresented: $app.isAddMusicPresented, onDismiss: { importer.close() }) { PhoneImportSheet() }
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .tabViewBottomAccessory(isEnabled: player.hasItem) { PhoneMiniPlayer() }
+        .environment(self.navigator)
+        .modifier(PhoneSheets(navigator: self.navigator))
         .overlay(alignment: .bottom) {
             if let message = toasts.message {
                 ToastView(message: message)
-                    .padding(.bottom, player.hasItem ? 96 : 24)
+                    .padding(.bottom, player.hasItem ? 150 : 100)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
@@ -43,122 +35,79 @@ struct PhoneRootView: View {
         .preferredColorScheme(.dark)
         // The backdrop picks up the colour of the cover that's playing.
         .task(id: player.currentItem?.artworkKey) { await player.refreshTint() }
-        .onAppear {
-            library.layout = .list
-            library.sort = .title
-        }
-    }
-
-    @ViewBuilder private var content: some View {
-        if library.isLibraryEmpty {
-            PhoneEmptyLibrary()
-        } else if library.hasNoResults {
-            ContentUnavailableView.search(text: library.searchText)
-        } else {
-            PhoneSongList()
-        }
-    }
-
-    private var addMenu: some View {
-        Menu {
-            Button { Task { await importer.chooseFiles() } } label: {
-                Label("Add songs\u{2026}", systemImage: "music.note")
-            }
-            Button { Task { await importer.chooseFolder() } } label: {
-                Label("Add a folder\u{2026}", systemImage: "folder")
-            }
-        } label: {
-            Image(systemName: "plus")
-        }
-        .accessibilityLabel("Add music")
+        // Pages opened the Mac way (`app.navigate`) show up on the phone's stacks too.
+        .onChange(of: app.route) { _, route in self.navigator.open(route) }
     }
 }
 
-// MARK: - Songs
+/// The sheets and dialogs that can come up over any tab.
+private struct PhoneSheets: ViewModifier {
+    let navigator: PhoneNavigator
 
-private struct PhoneSongList: View {
+    @Environment(AppViewModel.self) private var app
     @Environment(LibraryViewModel.self) private var library
     @Environment(PlayerViewModel.self) private var player
-
-    var body: some View {
-        let tracks = library.visibleTracks
-        List(tracks) { track in
-            Button {
-                player.play(track, in: tracks, context: "My Music")
-            } label: {
-                PhoneTrackRow(track: track, isCurrent: player.isCurrent(track), isPlaying: player.isPlaying)
-            }
-            .buttonStyle(.plain)
-            .listRowBackground(Color.clear)
-            .listRowSeparatorTint(Theme.hairline)
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-    }
-}
-
-private struct PhoneTrackRow: View {
-    let track: Track
-    let isCurrent: Bool
-    let isPlaying: Bool
-
-    var body: some View {
-        HStack(spacing: 12) {
-            ArtworkView(key: track.artworkKey, pixelSize: 112, cornerRadius: 8)
-                .frame(width: 52, height: 52)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(track.title)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(isCurrent ? Theme.accentLight : Theme.text)
-                    .lineLimit(1)
-                Text("\(track.artist) \u{00B7} \(track.album)")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Theme.muted)
-                    .lineLimit(1)
-            }
-            Spacer(minLength: 8)
-            if isCurrent {
-                Image(systemName: "waveform")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.accentLight)
-                    .symbolEffect(.variableColor.iterative.dimInactiveLayers, isActive: isPlaying)
-            }
-            Text(TimeFormat.clock(track.duration))
-                .font(.system(size: 13))
-                .monospacedDigit()
-                .foregroundStyle(Theme.muted)
-        }
-        .padding(.vertical, 4)
-        .contentShape(Rectangle())
-    }
-}
-
-// MARK: - Empty
-
-private struct PhoneEmptyLibrary: View {
+    @Environment(PlaylistsViewModel.self) private var playlists
     @Environment(ImportViewModel.self) private var importer
+    @Environment(ToastCenter.self) private var toasts
+    @Environment(CoverImporter.self) private var covers
 
-    var body: some View {
-        VStack(spacing: 14) {
-            VinylDisc()
-                .frame(width: 128, height: 128)
-                .padding(.bottom, 10)
-            Text("Your library is empty")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(Theme.text)
-            Text("Add MP3, FLAC, M4A or WAV files from the Files app. No accounts, no streaming \u{2014} just your music.")
-                .font(.system(size: 15))
-                .foregroundStyle(Theme.muted)
-                .multilineTextAlignment(.center)
-                .lineSpacing(3)
-            Button { Task { await importer.chooseFiles() } } label: {
-                Label("Add music", systemImage: "plus")
-                    .padding(.horizontal, 10)
+    func body(content: Content) -> some View {
+        @Bindable var app = app
+
+        content
+            .sheet(isPresented: $app.isNowPlayingPresented, onDismiss: { app.dismissNowPlaying() }) {
+                PhoneNowPlayingView().environment(navigator)
             }
-            .buttonStyle(AccentButtonStyle(height: 50))
-            .padding(.top, 10)
-        }
-        .padding(.horizontal, 32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .sheet(isPresented: $app.isAddMusicPresented, onDismiss: { importer.close() }) { PhoneImportSheet() }
+            .sheet(item: $app.playlistEditor) { editor in
+                PlaylistEditorSheet(editor: editor, playlists: playlists, covers: covers) { created in
+                    navigator.open(.playlist(created))
+                }
+            }
+            .sheet(item: $app.albumBeingEdited) { album in
+                AlbumEditorSheet(album: album, library: library, covers: covers) { newID in
+                    // The album's id changes with its name; keep the open page pointing at it.
+                    if navigator.libraryPath.last == .album(album.id) {
+                        navigator.libraryPath[navigator.libraryPath.count - 1] = .album(newID)
+                    }
+                }
+            }
+            .sheet(item: $app.trackBeingEdited) { track in
+                TrackEditorSheet(track: track, library: library, covers: covers)
+            }
+            .confirmationDialog(
+                "Delete \u{201C}\(pendingDeletionName)\u{201D}?",
+                isPresented: Binding(
+                    get: { app.playlistPendingDeletion != nil },
+                    set: { if !$0 { app.playlistPendingDeletion = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Playlist", role: .destructive) { confirmDeletion() }
+            } message: {
+                Text("The songs stay in your library.")
+            }
+            .onChange(of: player.errorMessage) { _, message in
+                guard let message else { return }
+                toasts.show(message, duration: .seconds(5))
+                player.dismissError()
+            }
+            .onChange(of: library.errorMessage) { _, message in
+                guard let message else { return }
+                toasts.show(message, duration: .seconds(6))
+                library.dismissError()
+            }
+    }
+
+    private var pendingDeletionName: String {
+        app.playlistPendingDeletion.flatMap { playlists.summary(for: $0)?.name } ?? "playlist"
+    }
+
+    private func confirmDeletion() {
+        guard let id = app.playlistPendingDeletion else { return }
+        app.playlistPendingDeletion = nil
+        if navigator.playlistsPath.last == .playlist(id) { navigator.playlistsPath.removeLast() }
+        playlists.delete(id)
     }
 }

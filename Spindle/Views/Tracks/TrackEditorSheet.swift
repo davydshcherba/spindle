@@ -74,7 +74,7 @@ struct TrackEditorSheet: View {
             }
         }
         .padding(24)
-        .frame(width: 480)
+        .sheetContentWidth(480)
         .preferredColorScheme(.dark)
         .onAppear { focus = .title }
         // Typing in the Album field suggests the albums that match.

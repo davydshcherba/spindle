@@ -36,6 +36,8 @@ final class AppViewModel {
 
     var isNowPlayingPresented = false
     var isQueueVisible = false
+    /// The equalizer sheet over Now Playing (on the phone; the Mac uses a popover of its own).
+    var isEqualizerPresented = false
     var isAddMusicPresented = false
     var playlistEditor: PlaylistEditor?
     var playlistPendingDeletion: UUID?

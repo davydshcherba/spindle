@@ -28,6 +28,7 @@ extension AppModel {
             }
 
             if screens.contains("list") { self.library.layout = .list }
+            if screens.contains("albums") { self.library.filter = .albums; self.library.layout = .grid }
             if screens.contains("artists") { self.library.filter = .artists }
             if screens.contains("recent") { self.library.filter = .recentlyAdded }
             if screens.contains("playlists") { app.navigate(to: .playlists) }
@@ -52,6 +53,7 @@ extension AppModel {
             }
             if screens.contains("nowplaying") || screens.contains("queue") { app.presentNowPlaying() }
             if screens.contains("queue") { app.isQueueVisible = true }
+            if screens.contains("eq") { app.presentNowPlaying(); app.isEqualizerPresented = true }
         }
     }
 

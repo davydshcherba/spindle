@@ -16,7 +16,7 @@ struct EqualizerPanel: View {
                 .foregroundStyle(Theme.muted)
         }
         .padding(18)
-        .frame(width: 520)
+        .sheetContentWidth(520)
     }
 
     // MARK: Header
