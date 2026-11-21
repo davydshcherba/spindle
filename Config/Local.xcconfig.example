@@ -1,0 +1,8 @@
+// Copy this file to Local.xcconfig (same folder), then edit. Local.xcconfig is ignored by git.
+
+// Your team's 10-character ID. In Xcode: Settings > Accounts, add your Apple ID, then it shows
+// under the team's name (or run: defaults read com.apple.dt.Xcode IDEProvisioningTeams).
+DEVELOPMENT_TEAM = ABCDE12345
+
+// Only needed if Xcode says the bundle identifier is not available:
+// PRODUCT_BUNDLE_IDENTIFIER = com.yourname.Spindle

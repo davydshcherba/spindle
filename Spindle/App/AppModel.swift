@@ -21,6 +21,8 @@ final class AppModel {
         player = PlayerViewModel(service: services.player, library: services.library, artwork: services.artwork)
         #if os(macOS)
         let picker: any FilePicking = MacFilePicker()
+        #else
+        let picker: any FilePicking = IOSFilePicker()
         #endif
         importer = ImportViewModel(library: services.library, picker: picker, app: app, toasts: toasts)
         covers = CoverImporter(picker: picker, artwork: services.artwork)

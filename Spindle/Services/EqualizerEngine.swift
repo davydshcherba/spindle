@@ -1,4 +1,5 @@
 import AudioToolbox
+import CoreAudio
 import Foundation
 import os
 import Synchronization

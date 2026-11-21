@@ -91,19 +91,109 @@ struct LibraryServiceTests {
         #expect(harness.library.importSession?.total == 0)
     }
 
-    // MARK: Bookmarks & persistence
+    // MARK: The library's own copies & persistence
 
-    @Test func savesBookmarksThatResolveToTheOriginalFile() async throws {
+    @Test func importCopiesTheSongIntoTheLibraryAndLeavesTheOriginal() async throws {
         let harness = try LibraryHarness()
         defer { harness.cleanUp() }
         let urls = try harness.makePlainTracks(count: 1)
         await harness.importAndWait(urls)
 
         let track = try #require(harness.library.tracks.first)
-        let resolved = try SecurityScopedBookmark.resolve(track.bookmarkData)
+        let name = try #require(track.libraryFileName)
+        #expect(name.hasSuffix(".wav"))
+        #expect(harness.files.exists(name))
+        #expect(try Data(contentsOf: harness.files.url(for: name)) == Data(contentsOf: urls[0]))
+        #expect(FileManager.default.fileExists(atPath: urls[0].path), "the original must stay where it was")
+        #expect(track.bookmarkData.isEmpty, "new songs need no pointer to the original")
+    }
 
-        #expect(resolved.url.resolvingSymlinksInPath().path == urls[0].resolvingSymlinksInPath().path)
-        #expect(!resolved.isStale)
+    @Test func theLibraryKeepsTheSongWhenTheOriginalIsDeleted() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        await harness.importAndWait(urls)
+        try FileManager.default.removeItem(at: urls[0])
+
+        let name = try #require(harness.library.tracks.first?.libraryFileName)
+        #expect(harness.files.exists(name))
+    }
+
+    @Test func removingASongDeletesItsCopyButNotTheOriginal() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 2)
+        await harness.importAndWait(urls)
+        let removed = try #require(harness.library.tracks.first { $0.title == "Track 1" })
+        let kept = try #require(harness.library.tracks.first { $0.title == "Track 2" })
+        let removedName = try #require(removed.libraryFileName)
+        let keptName = try #require(kept.libraryFileName)
+
+        harness.library.remove([removed])
+
+        #expect(!harness.files.exists(removedName))
+        #expect(harness.files.exists(keptName))
+        #expect(urls.allSatisfy { FileManager.default.fileExists(atPath: $0.path) }, "originals are never deleted")
+    }
+
+    @Test func aSkippedDuplicateLeavesNoStrayCopy() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        // The same recording kept in another folder: different path, same title and length.
+        let otherFolder = harness.root.appending(path: "elsewhere", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: otherFolder, withIntermediateDirectories: true)
+        let twin = otherFolder.appending(path: urls[0].lastPathComponent)
+        try FileManager.default.copyItem(at: urls[0], to: twin)
+
+        await harness.importAndWait(urls)
+        await harness.importAndWait([twin])
+
+        #expect(harness.library.tracks.count == 1)
+        let stored = try FileManager.default.contentsOfDirectory(atPath: harness.files.directory.path)
+        #expect(stored.count == 1, "only one copy of the recording should be kept")
+    }
+
+    // MARK: Songs from before Spindle kept its own copies
+
+    private func insertLegacyTrack(in harness: LibraryHarness, original: URL) throws {
+        let legacy = Track(
+            title: "Track 1", artist: "Someone", albumArtist: "Someone", album: "Old Album",
+            duration: 2, fileSize: 1, fileExtension: "wav", filePath: original.path,
+            libraryFileName: nil, bookmarkData: try SecurityScopedBookmark.make(for: original)
+        )
+        harness.container.mainContext.insert(legacy)
+        try harness.container.mainContext.save()
+        harness.library.reload()
+    }
+
+    @Test func olderSongsAreCopiedIntoTheLibrary() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        try insertLegacyTrack(in: harness, original: urls[0])
+
+        await harness.library.migrateLegacyTracks()
+
+        let track = try #require(harness.library.tracks.first)
+        let name = try #require(track.libraryFileName)
+        #expect(harness.files.exists(name))
+        #expect(track.bookmarkData.isEmpty)
+        #expect(FileManager.default.fileExists(atPath: urls[0].path), "the original stays where it was")
+    }
+
+    @Test func anOlderSongWhoseOriginalIsGoneIsLeftForALaterTry() async throws {
+        let harness = try LibraryHarness()
+        defer { harness.cleanUp() }
+        let urls = try harness.makePlainTracks(count: 1)
+        try insertLegacyTrack(in: harness, original: urls[0])
+        try FileManager.default.removeItem(at: urls[0])
+
+        await harness.library.migrateLegacyTracks()
+
+        let track = try #require(harness.library.tracks.first)
+        #expect(track.libraryFileName == nil)
+        #expect(!track.bookmarkData.isEmpty, "the pointer is kept so a later launch can try again")
     }
 
     @Test func libraryLoadsAgainOnNextLaunchWithoutReimporting() async throws {
@@ -114,13 +204,13 @@ struct LibraryServiceTests {
         harness.library.add(trackIDs: harness.library.tracks.map(\.id), to: playlist)
 
         // A fresh service over the same store behaves like a relaunch.
-        let relaunched = LibraryService(modelContext: ModelContext(harness.container), artwork: harness.artwork)
+        let relaunched = LibraryService(modelContext: ModelContext(harness.container), artwork: harness.artwork, files: harness.files)
 
         #expect(relaunched.tracks.count == 4)
         #expect(relaunched.playlists.map(\.name) == ["Favourites"])
         let track = try #require(relaunched.tracks.first)
-        let resolved = try SecurityScopedBookmark.resolve(track.bookmarkData)
-        #expect(FileManager.default.fileExists(atPath: resolved.url.path))
+        let name = try #require(track.libraryFileName)
+        #expect(harness.files.exists(name))
     }
 
     // MARK: Artwork

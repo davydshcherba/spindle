@@ -47,8 +47,10 @@ struct ArtworkView: View {
             isMissing = true
             return
         }
-        if store.cachedImage(forKey: key, maxPixelSize: pixelSize) != nil {
-            loaded = nil // the cached copy is picked up in `body`
+        if let cached = store.cachedImage(forKey: key, maxPixelSize: pixelSize) {
+            // Another row with the same cover may have decoded it after this view first drew
+            // blank. Keep the image in state, so the view is redrawn with it.
+            loaded = cached
             return
         }
         loaded = nil

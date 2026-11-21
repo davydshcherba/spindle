@@ -8,6 +8,7 @@ final class LibraryHarness {
     let container: ModelContainer
     let library: LibraryService
     let artwork: ArtworkStore
+    let files: LibraryFiles
     let root: URL
     private var defaultsSuites: [String] = []
 
@@ -18,7 +19,8 @@ final class LibraryHarness {
         )
         root = try Fixtures.makeScratchDirectory()
         artwork = ArtworkStore(directory: root.appending(path: "artwork", directoryHint: .isDirectory))
-        library = LibraryService(modelContext: container.mainContext, artwork: artwork)
+        files = LibraryFiles(directory: root.appending(path: "library", directoryHint: .isDirectory))
+        library = LibraryService(modelContext: container.mainContext, artwork: artwork, files: files)
     }
 
     /// A throwaway `UserDefaults` for a `PlayerService`; removed again in `cleanUp()`.

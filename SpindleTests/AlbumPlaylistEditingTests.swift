@@ -277,7 +277,7 @@ struct PlaylistCoverTests {
 
         rig.playlists.update(playlist.id, name: "Mix", cover: .set("my-cover"))
 
-        let relaunched = LibraryService(modelContext: ModelContext(rig.harness.container), artwork: rig.harness.artwork)
+        let relaunched = LibraryService(modelContext: ModelContext(rig.harness.container), artwork: rig.harness.artwork, files: rig.harness.files)
         #expect(relaunched.playlists.first { $0.id == playlist.id }?.coverKey == "my-cover")
     }
 

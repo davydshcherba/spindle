@@ -81,7 +81,7 @@ struct PlaylistEditorSheet: View {
             }
         }
         .padding(24)
-        .frame(width: 440)
+        .sheetContentWidth(440)
         .preferredColorScheme(.dark)
         .onAppear { isFocused = true }
     }

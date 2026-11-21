@@ -26,7 +26,7 @@ struct Rig {
     static func make() async throws -> Rig {
         let harness = try LibraryHarness()
         await harness.importAndWait([try await harness.makeMusicFolder()])
-        let service = PlayerService(defaults: harness.makeDefaults())
+        let service = PlayerService(defaults: harness.makeDefaults(), files: harness.files)
         service.volume = 0
         let toasts = ToastCenter()
         return Rig(

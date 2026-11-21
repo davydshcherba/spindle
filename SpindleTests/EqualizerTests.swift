@@ -247,7 +247,7 @@ struct EqualizerTests {
 
         let equalizer = Equalizer(defaults: harness.makeDefaults())
         equalizer.apply(.rock)
-        let player = PlayerService(defaults: harness.makeDefaults(), equalizer: equalizer.parameters)
+        let player = PlayerService(defaults: harness.makeDefaults(), equalizer: equalizer.parameters, files: harness.files)
         player.volume = 0 // tests must never make noise
 
         player.play(harness.library.tracks.map(\.playerItem), context: "Test")
@@ -268,7 +268,7 @@ struct EqualizerTests {
 
         let equalizer = Equalizer(defaults: harness.makeDefaults())
         equalizer.apply(.rock)
-        let player = PlayerService(defaults: harness.makeDefaults(), equalizer: equalizer.parameters)
+        let player = PlayerService(defaults: harness.makeDefaults(), equalizer: equalizer.parameters, files: harness.files)
         player.volume = 0 // tests must never make noise
 
         for item in items {

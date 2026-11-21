@@ -90,7 +90,7 @@ struct TrackEditingTests {
         rig.library.apply(edit, to: loose)
 
         #expect(rig.harness.library.revision > revision, "derived lists must be rebuilt")
-        let relaunched = LibraryService(modelContext: ModelContext(rig.harness.container), artwork: rig.harness.artwork)
+        let relaunched = LibraryService(modelContext: ModelContext(rig.harness.container), artwork: rig.harness.artwork, files: rig.harness.files)
         let saved = try #require(relaunched.tracks.first { $0.id == loose.id })
         #expect(saved.title == "Loose Demo (2024 mix)")
         #expect(saved.artist == "Maren Volk")
