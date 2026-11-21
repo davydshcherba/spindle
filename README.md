@@ -103,6 +103,17 @@ ditto .build/Build/Products/Release/Spindle.app ~/Applications/Spindle.app
 You get a universal (Apple Silicon + Intel) `Spindle.app` of about 8 MB. It is signed ad hoc, so it runs on the Mac
 that built it. To hand it to other people you'd need an Apple Developer ID and notarization.
 
+### Make an installer disk image
+
+```sh
+Scripts/make-dmg.sh .build/Build/Products/Release/Spindle.app
+```
+
+This writes `.build/Spindle-<version>.dmg`: a window in Spindle's colours with the app, an arrow and a shortcut to
+Applications. It needs Xcode's command line tools and `python3`; the first run installs
+[dmgbuild](https://github.com/dmgbuild/dmgbuild) into `.build/dmg/venv`. The picture is drawn by
+[`background.swift`](Scripts/dmg/background.swift) and the window layout lives in [`settings.py`](Scripts/dmg/settings.py).
+
 ### Where do my songs live?
 
 Spindle never copies or moves your music. The library (titles, artists, bookmarks to the files) and a small cover-art
