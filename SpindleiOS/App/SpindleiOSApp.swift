@@ -8,7 +8,11 @@ struct SpindleiOSApp: App {
         WindowGroup {
             switch startup {
             case .success(let model):
-                PhoneRootView().appEnvironment(model)
+                PhoneRootView()
+                    .appEnvironment(model)
+                    // "Open in Spindle" from Files, Safari or the share sheet. Several songs arrive
+                    // as several calls; the import queues them one batch after another.
+                    .onOpenURL { url in _ = model.importer.handleDrop([url]) }
             case .failure(let error):
                 PhoneStartupErrorView(error: error)
             }

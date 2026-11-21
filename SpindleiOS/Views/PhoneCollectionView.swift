@@ -66,7 +66,7 @@ struct PhoneCollectionView<Cover: View, MoreMenu: View>: View {
     private var header: some View {
         VStack(spacing: 16) {
             cover()
-                .frame(maxWidth: 250)
+                .frame(maxWidth: 220)
                 .shadow(color: .black.opacity(0.4), radius: 22, y: 12)
 
             VStack(spacing: 4) {

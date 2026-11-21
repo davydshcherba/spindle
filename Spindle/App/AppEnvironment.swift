@@ -41,14 +41,21 @@ final class AppEnvironment {
     /// The real app uses the on-disk store. Unit tests host the app, so they get a throwaway one
     /// instead of touching the user's library.
     static func makeForCurrentProcess() throws -> AppEnvironment {
-        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil else {
+        let environment = ProcessInfo.processInfo.environment
+        // UI tests launch the app itself (not hosted), so they ask for the same throwaway store by name.
+        #if DEBUG
+        let isUITest = environment["SPINDLE_UI_TESTING"] != nil
+        #else
+        let isUITest = false
+        #endif
+        guard environment["XCTestConfigurationFilePath"] != nil || isUITest else {
             return try AppEnvironment()
         }
         return try AppEnvironment(
             inMemory: true,
             artworkDirectory: FileManager.default.temporaryDirectory.appending(path: "SpindleTestHost-\(UUID().uuidString)"),
             libraryDirectory: FileManager.default.temporaryDirectory.appending(path: "SpindleTestHostMusic-\(UUID().uuidString)"),
-            defaults: UserDefaults(suiteName: "SpindleTestHost") ?? .standard
+            defaults: UserDefaults(suiteName: isUITest ? "SpindleUITest-\(UUID().uuidString)" : "SpindleTestHost") ?? .standard
         )
     }
 }

@@ -11,29 +11,38 @@ struct PhoneMiniPlayer: View {
         if let item = player.currentItem {
             let isInline = placement == .inline
             HStack(spacing: 12) {
-                // A new cover settles in over the old one when the track changes.
-                Swap(id: item.artworkKey, style: .cover) {
-                    ArtworkView(key: item.artworkKey, pixelSize: 96, cornerRadius: 8)
-                }
-                .frame(width: 36, height: 36)
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Swap(id: item.id, alignment: .leading) {
-                        Text(item.title)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Theme.text)
-                            .lineLimit(1)
-                    }
-                    if !isInline {
-                        Swap(id: item.id, alignment: .leading, delay: 0.04) {
-                            Text(item.artist)
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.muted)
-                                .lineLimit(1)
+                // The cover and the title open the full player.
+                Button { app.presentNowPlaying() } label: {
+                    HStack(spacing: 12) {
+                        // A new cover settles in over the old one when the track changes.
+                        Swap(id: item.artworkKey, style: .cover) {
+                            ArtworkView(key: item.artworkKey, pixelSize: 96, cornerRadius: 8)
                         }
+                        .frame(width: 36, height: 36)
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Swap(id: item.id, alignment: .leading) {
+                                Text(item.title)
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(Theme.text)
+                                    .lineLimit(1)
+                            }
+                            if !isInline {
+                                Swap(id: item.id, alignment: .leading, delay: 0.04) {
+                                    Text(item.artist)
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Theme.muted)
+                                        .lineLimit(1)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open player")
+                .accessibilityValue("\(item.title), \(item.artist)")
 
                 PlayPauseButton(size: 34)
                 if !isInline {
@@ -43,10 +52,6 @@ struct PhoneMiniPlayer: View {
                 }
             }
             .padding(.horizontal, 14)
-            .contentShape(Rectangle())
-            .onTapGesture { app.presentNowPlaying() }
-            .accessibilityElement(children: .contain)
-            .accessibilityAction(named: "Open player") { app.presentNowPlaying() }
         }
     }
 }

@@ -123,7 +123,7 @@ real iPhone you need an Apple ID added in Xcode's Settings → Accounts, and Dev
 git) and put your team ID in it; if Xcode says the bundle identifier is taken, set your own there too.
 
 The iPhone app has its own screens in [`SpindleiOS/`](SpindleiOS/) and shares the models, services, editors and the
-equalizer with the Mac app. To try it with a folder of songs, add `SPINDLE_SEED_DIR=/path/to/songs` to the scheme's
+equalizer with the Mac app. Songs can also be added from the Files app or the share sheet with "Open in Spindle". To try it with a folder of songs, add `SPINDLE_SEED_DIR=/path/to/songs` to the scheme's
 environment variables (Debug builds import it once, while the library is empty).
 
 ### Where do my songs live?
@@ -184,9 +184,16 @@ Spindle/
 xcodebuild -scheme Spindle -destination 'platform=macOS' test
 ```
 
-142 [Swift Testing](https://developer.apple.com/documentation/testing) tests cover importing, tag reading, playback,
-queue behaviour, playlists, editing and the view models. Audio fixtures (MP3, M4A, FLAC with tags and cover art) are
-generated in code, so the repo ships no binary test files.
+146 [Swift Testing](https://developer.apple.com/documentation/testing) tests cover importing, tag reading, playback,
+queue behaviour, playlists, editing, the equalizer and the view models. Audio fixtures (MP3, M4A, FLAC with tags and
+cover art) are generated in code, so the repo ships no binary test files.
+
+The iPhone app has UI tests that drive it in the simulator (tabs, search, swipes, long presses, the queue, the
+equalizer, playlists, editing):
+
+```sh
+xcodebuild -scheme SpindleiOS -destination 'platform=iOS Simulator,name=iPhone 17' test
+```
 
 Debug builds also understand a few launch variables for setting up a screen quickly — see
 [`DebugLaunch.swift`](Spindle/App/DebugLaunch.swift). They are compiled out of Release builds.
