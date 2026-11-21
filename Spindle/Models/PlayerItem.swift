@@ -10,7 +10,8 @@ nonisolated struct PlayerItem: Identifiable, Hashable, Sendable {
     var album: String
     var duration: TimeInterval
     var artworkKey: String?
-    var bookmarkData: Data
+    /// The song's file inside the library folder; nil if it has none.
+    var libraryFileName: String?
 }
 
 /// One slot in the play queue. The queue can contain the same track twice, so

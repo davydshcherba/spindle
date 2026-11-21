@@ -16,6 +16,7 @@ final class AppEnvironment {
     init(
         inMemory: Bool = false,
         artworkDirectory: URL = ArtworkStore.defaultDirectory(),
+        libraryDirectory: URL = LibraryFiles.defaultDirectory(),
         defaults: UserDefaults = .standard
     ) throws {
         let schema = Schema([Track.self, Playlist.self])
@@ -23,16 +24,18 @@ final class AppEnvironment {
         container = try ModelContainer(for: schema, configurations: configuration)
 
         artwork = ArtworkStore(directory: artworkDirectory)
-        library = LibraryService(modelContext: container.mainContext, artwork: artwork)
+        let files = LibraryFiles(directory: libraryDirectory)
+        library = LibraryService(modelContext: container.mainContext, artwork: artwork, files: files)
         equalizer = Equalizer(defaults: defaults)
-        player = PlayerService(defaults: defaults, equalizer: equalizer.parameters)
+        player = PlayerService(defaults: defaults, equalizer: equalizer.parameters, files: files)
         nowPlaying = NowPlayingService(player: player, artwork: artwork)
         #if os(iOS)
         audioSession = AudioSessionHandler(player: player)
         #endif
 
+        // Songs from before Spindle kept its own copies are copied in, once, in the background.
         let library = library
-        player.onBookmarkRefreshed = { id, data in library.updateBookmark(forTrackWithID: id, to: data) }
+        Task { await library.migrateLegacyTracks() }
     }
 
     /// The real app uses the on-disk store. Unit tests host the app, so they get a throwaway one
@@ -44,6 +47,7 @@ final class AppEnvironment {
         return try AppEnvironment(
             inMemory: true,
             artworkDirectory: FileManager.default.temporaryDirectory.appending(path: "SpindleTestHost-\(UUID().uuidString)"),
+            libraryDirectory: FileManager.default.temporaryDirectory.appending(path: "SpindleTestHostMusic-\(UUID().uuidString)"),
             defaults: UserDefaults(suiteName: "SpindleTestHost") ?? .standard
         )
     }

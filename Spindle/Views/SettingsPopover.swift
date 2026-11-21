@@ -73,7 +73,7 @@ struct SettingsPopover: View {
         .confirmationDialog("Remove all music from Spindle?", isPresented: $isConfirmingRemoval, titleVisibility: .visible) {
             Button("Remove All Music", role: .destructive) { library.removeAllMusic() }
         } message: {
-            Text("Your files on disk are not touched. Playlists are kept but become empty.")
+            Text("Spindle\u{2019}s copies of the songs are deleted. The original files you added are not touched. Playlists are kept but become empty.")
         }
     }
 }

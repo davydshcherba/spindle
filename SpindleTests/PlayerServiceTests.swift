@@ -18,7 +18,7 @@ struct PlayerServiceTests {
         let urls = try harness.makePlainTracks(count: count, seconds: seconds)
         await harness.importAndWait(urls)
         let items = harness.library.tracks.sorted { $0.title < $1.title }.map(\.playerItem)
-        let player = PlayerService(defaults: harness.makeDefaults())
+        let player = PlayerService(defaults: harness.makeDefaults(), files: harness.files)
         player.volume = 0 // tests must never make noise
         return Setup(harness: harness, player: player, items: items, urls: urls)
     }
@@ -215,13 +215,30 @@ struct PlayerServiceTests {
         let setup = try await makeSetup(count: 3)
         defer { setup.harness.cleanUp() }
         let player = setup.player
-        try FileManager.default.removeItem(at: setup.urls[0]) // "Track 1"
+        let track = try #require(setup.harness.library.tracks.first { $0.title == "Track 1" })
+        setup.harness.files.remove(try #require(track.libraryFileName)) // Spindle's own copy of "Track 1"
 
         player.play(setup.items, startIndex: 0, context: "My Music")
 
         #expect(player.errorMessage?.contains("Track 1") == true)
         #expect(player.currentItem?.title == "Track 2", "should skip to the next playable track")
         #expect(player.isPlaying)
+        player.stop()
+    }
+
+    @Test func playsFromTheLibraryAfterTheOriginalIsDeleted() async throws {
+        let setup = try await makeSetup(count: 2)
+        defer { setup.harness.cleanUp() }
+        let player = setup.player
+        for url in setup.urls { try FileManager.default.removeItem(at: url) }
+
+        player.play(setup.items, startIndex: 0, context: "My Music")
+
+        #expect(player.isPlaying)
+        #expect(player.currentItem?.title == "Track 1")
+        #expect(player.errorMessage == nil)
+        let advanced = await waitUntil { player.currentTime > 0.5 }
+        #expect(advanced, "the library's copy should play even though the original is gone")
         player.stop()
     }
 

@@ -32,8 +32,8 @@ bought. Spindle is a calm, fast player for exactly that. Point it at a folder an
 - **Bring your music in** — pick files or whole folders, or drag them onto the window. Tags and embedded cover art are
   read automatically (ID3, iTunes/M4A and FLAC/Vorbis), duplicates can be skipped, and a live progress view shows the
   import while you keep listening.
-- **Remembers your library** — files stay where they are; Spindle keeps security-scoped bookmarks, so it never asks
-  for access again after a relaunch.
+- **Keeps your library for you** — every song you add is copied into Spindle's own folder, so it keeps playing when
+  you move, rename or delete the original, and you never have to think about where your music is.
 - **Browse your way** — an album grid or a track list, with *All / Albums / Artists / Recently added* filters, sorting
   and instant search.
 - **Playlists** — create, rename, delete, give them your own cover. Add songs from a hover button or the right-click
@@ -117,9 +117,13 @@ Applications. It needs Xcode's command line tools and `python3`; the first run i
 
 ### Where do my songs live?
 
-Spindle never copies or moves your music. The library (titles, artists, bookmarks to the files) and a small cover-art
-cache live in the app's sandbox container, `~/Library/Containers/com.spindle.Spindle/`. If a file is deleted, Spindle
-tells you and skips it; removing a song from Spindle never deletes the file.
+In Spindle's own folder — you don't have to manage it. When you add a song, Spindle copies it into
+`~/Library/Containers/com.spindle.Spindle/Data/Library/Application Support/Spindle/Music/` (on the same drive the copy
+costs no extra space), next to the library database and the cover-art cache. After that the original is not needed:
+move it, rename it or delete it and the song still plays.
+
+Removing a song from Spindle deletes Spindle's copy, never the original you added. Libraries made by an earlier
+version are copied into the folder automatically the first time you open the app.
 
 ## Editing without touching your files
 
@@ -159,8 +163,9 @@ Spindle/
   main thread.
 - **Playlists store an ordered list of track ids**, because SwiftData doesn't guarantee the order of relationships.
 - **FLAC tags are parsed directly** from the file's metadata blocks instead of relying on system support.
-- **Sandboxed**, with user-selected read-only file access and app-scoped bookmarks
-  (see [`Config/Spindle.entitlements`](Config/Spindle.entitlements)).
+- **Sandboxed**, with user-selected read-only file access to what you import. Songs are copied into the app's own
+  folder, so nothing depends on the originals afterwards; the app-scoped bookmark entitlement is kept only to move
+  libraries from earlier versions (see [`Config/Spindle.entitlements`](Config/Spindle.entitlements)).
 
 ## Tests
 
@@ -168,7 +173,7 @@ Spindle/
 xcodebuild -scheme Spindle -destination 'platform=macOS' test
 ```
 
-104 [Swift Testing](https://developer.apple.com/documentation/testing) tests cover importing, tag reading, playback,
+142 [Swift Testing](https://developer.apple.com/documentation/testing) tests cover importing, tag reading, playback,
 queue behaviour, playlists, editing and the view models. Audio fixtures (MP3, M4A, FLAC with tags and cover art) are
 generated in code, so the repo ships no binary test files.
 

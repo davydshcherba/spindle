@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0043E3DD397738CD40982F00 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC42F10E2A3FE3A757E7819 /* ArtworkStore.swift */; };
+		7F1A2B3C4D5E6F708192A3B5 /* LibraryFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1A2B3C4D5E6F708192A3B4 /* LibraryFiles.swift */; };
 		032A6D47C5145348B84128EE /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716B910AEB5D50D2E4749F7E /* CollectionDetailView.swift */; };
 		045E90F103ABEE65CD660366 /* SpindleiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A369CB161AE53C10E1A0EC /* SpindleiOSApp.swift */; };
 		05A34D024F145BF04249F246 /* PhoneMiniPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934E782C0FE32A753BB607B2 /* PhoneMiniPlayer.swift */; };
@@ -97,6 +98,7 @@
 		A54A71FE297FCABC10BC61F2 /* DebugLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD12E5239A55107A7CC27D95 /* DebugLaunch.swift */; };
 		A61F450463F35FE863CB0779 /* ImportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 985BF6F4211619E1F7D5175E /* ImportSession.swift */; };
 		A6572D9FE2CD83C551E9ACC7 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC42F10E2A3FE3A757E7819 /* ArtworkStore.swift */; };
+		7F1A2B3C4D5E6F708192A3B6 /* LibraryFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1A2B3C4D5E6F708192A3B4 /* LibraryFiles.swift */; };
 		AAFE6F53584B4F7D8F1E599A /* ImportWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC8CC0D25C88E99D8446E54 /* ImportWorker.swift */; };
 		AC19A6CAA520A6CE99AEAE86 /* Equalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28CF34372E208FFCAB8527D /* Equalizer.swift */; };
 		AD1EA4C2BD30D3AB0EF4BA82 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D4697D9A06D24C7908D3C5 /* Fixtures.swift */; };
@@ -215,6 +217,7 @@
 		A95857D048CA590668E34BFF /* TrackListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackListView.swift; sourceTree = "<group>"; };
 		AB0E4C2A1CD55ED85B26512D /* AmbientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientBackground.swift; sourceTree = "<group>"; };
 		ACC42F10E2A3FE3A757E7819 /* ArtworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkStore.swift; sourceTree = "<group>"; };
+		7F1A2B3C4D5E6F708192A3B4 /* LibraryFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryFiles.swift; sourceTree = "<group>"; };
 		AD1F66931C7A56D9994E78FF /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		B1DEB7B527540CE90C62844A /* LibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryService.swift; sourceTree = "<group>"; };
 		B655B213FBCD0EAC3CCF2C98 /* PlaylistEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditorViewModel.swift; sourceTree = "<group>"; };
@@ -398,6 +401,7 @@
 			isa = PBXGroup;
 			children = (
 				ACC42F10E2A3FE3A757E7819 /* ArtworkStore.swift */,
+				7F1A2B3C4D5E6F708192A3B4 /* LibraryFiles.swift */,
 				C63DE0D0D333DD9614627885 /* AudioFormat.swift */,
 				A8EC45B6C33CA829A9FBB6EF /* AudioSessionHandler.swift */,
 				862F69E27CEA0F7D5B0BFA07 /* CoverImporter.swift */,
@@ -673,6 +677,7 @@
 				786E10ACD1994F6464B064B3 /* AppModel.swift in Sources */,
 				133AEF770B3AE9A796370C41 /* AppViewModel.swift in Sources */,
 				0043E3DD397738CD40982F00 /* ArtworkStore.swift in Sources */,
+				7F1A2B3C4D5E6F708192A3B5 /* LibraryFiles.swift in Sources */,
 				4180916B33C7F2C2FF58F731 /* ArtworkView.swift in Sources */,
 				CFB55CE6D5709D39433E515F /* AudioFormat.swift in Sources */,
 				A092F4F2C58040374BECCE85 /* AudioSessionHandler.swift in Sources */,
@@ -747,6 +752,7 @@
 				EF02CB1C936C046F51A37C71 /* AppModel.swift in Sources */,
 				5FBE17C7D36639E342BC15EB /* AppViewModel.swift in Sources */,
 				A6572D9FE2CD83C551E9ACC7 /* ArtworkStore.swift in Sources */,
+				7F1A2B3C4D5E6F708192A3B6 /* LibraryFiles.swift in Sources */,
 				38CFA44DB57CB914756DD061 /* ArtworkView.swift in Sources */,
 				42DACEE81C71C7E43F14FC44 /* AudioFormat.swift in Sources */,
 				4D32756742B7BA4F11C9EBD0 /* AudioSessionHandler.swift in Sources */,

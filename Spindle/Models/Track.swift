@@ -4,8 +4,8 @@ import SwiftData
 /// A single audio file in the library.
 ///
 /// Metadata is cached here at import time so the library can be shown without
-/// touching the files. The file itself is reached through `bookmarkData`, a
-/// security-scoped bookmark, so access survives relaunches inside the sandbox.
+/// touching the files. The audio itself is Spindle's own copy, kept in the app's library
+/// folder (see `LibraryFiles`) under `libraryFileName`.
 @Model
 final class Track {
     @Attribute(.unique) var id: UUID
@@ -19,8 +19,14 @@ final class Track {
     var duration: TimeInterval
     var fileSize: Int64
     var fileExtension: String
-    /// Standardized path at import time. Used for duplicate detection and display only.
+    /// Where the song was imported from. Used for duplicate detection and display only; the
+    /// original may since have moved or gone.
     var filePath: String
+    /// Name of Spindle's copy inside the library folder. Nil only for a song from an older
+    /// version that has not been copied in yet: `LibraryService.migrateLegacyTracks()` does that.
+    var libraryFileName: String?
+    /// Pointer to the original file, from before Spindle kept its own copies. Only the
+    /// migration reads it; empty once the song has been copied in.
     var bookmarkData: Data
     /// Key into `ArtworkStore`; shared between tracks with identical cover art.
     var artworkKey: String?
@@ -39,7 +45,8 @@ final class Track {
         fileSize: Int64,
         fileExtension: String,
         filePath: String,
-        bookmarkData: Data,
+        libraryFileName: String?,
+        bookmarkData: Data = Data(),
         artworkKey: String? = nil,
         dateAdded: Date = .now
     ) {
@@ -55,6 +62,7 @@ final class Track {
         self.fileSize = fileSize
         self.fileExtension = fileExtension
         self.filePath = filePath
+        self.libraryFileName = libraryFileName
         self.bookmarkData = bookmarkData
         self.artworkKey = artworkKey
         self.dateAdded = dateAdded
@@ -83,7 +91,7 @@ extension Track {
             album: album,
             duration: duration,
             artworkKey: artworkKey,
-            bookmarkData: bookmarkData
+            libraryFileName: libraryFileName
         )
     }
 }

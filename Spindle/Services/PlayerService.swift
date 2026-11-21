@@ -13,7 +13,7 @@ nonisolated enum PlayerEvent: Sendable, Equatable {
 /// Plays a queue of tracks with AVPlayer, through the equalizer.
 ///
 /// Knows nothing about SwiftData or SwiftUI: it is handed `PlayerItem`s and
-/// resolves their security-scoped bookmarks itself. State is `@Observable` for
+/// finds their files in the library folder itself. State is `@Observable` for
 /// views; other services (Now Playing) subscribe through `addEventHandler`.
 @Observable
 final class PlayerService {
@@ -61,9 +61,6 @@ final class PlayerService {
 
     var hasPrevious: Bool { currentIndex != nil }
 
-    /// Called when a bookmark resolves as stale, with a fresh one for the same item.
-    @ObservationIgnored var onBookmarkRefreshed: ((UUID, Data) -> Void)?
-
     // MARK: Internals
 
     private enum Keys {
@@ -80,7 +77,7 @@ final class PlayerService {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let log = Logger(subsystem: "com.spindle.Spindle", category: "Player")
     @ObservationIgnored private var originalOrder: [QueueEntry] = []
-    @ObservationIgnored private var access: SecurityScopedAccess?
+    @ObservationIgnored private let files: LibraryFiles
     @ObservationIgnored private var timeObserver: Any?
     @ObservationIgnored private var endObserver: NSObjectProtocol?
     @ObservationIgnored private var statusObservation: NSKeyValueObservation?
@@ -89,10 +86,15 @@ final class PlayerService {
     @ObservationIgnored private var handlers: [(PlayerEvent) -> Void] = []
 
     /// `equalizer` holds the settings the music is run through; the default is a flat one that
-    /// nobody changes.
-    init(defaults: UserDefaults = .standard, equalizer: EqualizerParameters = EqualizerParameters()) {
+    /// nobody changes. `files` is the library folder the songs are played from.
+    init(
+        defaults: UserDefaults = .standard,
+        equalizer: EqualizerParameters = EqualizerParameters(),
+        files: LibraryFiles = LibraryFiles()
+    ) {
         self.defaults = defaults
         self.equalizer = equalizer
+        self.files = files
         self.volume = defaults.object(forKey: Keys.volume) as? Float ?? 0.7
         self.isShuffled = defaults.bool(forKey: Keys.shuffle)
         self.repeatMode = defaults.string(forKey: Keys.repeatMode).flatMap(RepeatMode.init(rawValue:)) ?? .off
@@ -225,8 +227,6 @@ final class PlayerService {
         player.pause()
         player.replaceCurrentItem(with: nil)
         detachItemObservers()
-        access?.stop()
-        access = nil
         queue = []
         originalOrder = []
         currentIndex = nil
@@ -286,29 +286,14 @@ final class PlayerService {
         duration = entry.item.duration
 
         detachItemObservers()
-        access?.stop()
-        access = nil
 
-        let url: URL
-        do {
-            let resolved = try SecurityScopedBookmark.resolve(entry.item.bookmarkData)
-            url = resolved.url
-            access = SecurityScopedAccess(url: url)
-            if resolved.isStale, let fresh = try? SecurityScopedBookmark.make(for: url) {
-                onBookmarkRefreshed?(entry.item.id, fresh)
-            }
-        } catch {
-            log.error("Bookmark failed for \(entry.item.title, privacy: .private): \(error.localizedDescription, privacy: .public)")
+        guard let fileName = entry.item.libraryFileName, files.exists(fileName) else {
+            log.error("No library file for \(entry.item.title, privacy: .private)")
             emit(.itemChanged)
-            didFail(entry, reason: "The file was moved or deleted.")
+            didFail(entry, reason: "The file is missing from your library.")
             return
         }
-
-        guard FileManager.default.isReadableFile(atPath: url.path) else {
-            emit(.itemChanged)
-            didFail(entry, reason: "The file was moved or deleted.")
-            return
-        }
+        let url = files.url(for: fileName)
 
         let item = AVPlayerItem(url: url)
         attachObservers(to: item, entry: entry)

@@ -6,9 +6,9 @@ import SwiftData
 /// Owns the library: importing files, the track list, and playlists.
 ///
 /// All persistence goes through here so view models stay free of SwiftData
-/// details. Heavy work (directory walks, tag reading, artwork encoding) runs in
-/// `ImportWorker` off the main actor; this class only touches the model context
-/// on the main actor.
+/// details. Heavy work (directory walks, tag reading, artwork encoding, copying songs into
+/// the library folder) runs in `ImportWorker` off the main actor; this class only touches the
+/// model context on the main actor.
 @Observable
 final class LibraryService {
     // MARK: Observable state
@@ -24,6 +24,7 @@ final class LibraryService {
 
     @ObservationIgnored let modelContext: ModelContext
     @ObservationIgnored let artwork: ArtworkStore
+    @ObservationIgnored let files: LibraryFiles
     @ObservationIgnored private let worker: ImportWorker
     @ObservationIgnored private let log = Logger(subsystem: "com.spindle.Spindle", category: "Library")
 
@@ -43,10 +44,11 @@ final class LibraryService {
         func stopAccessing() { accesses.forEach { $0.stop() } }
     }
 
-    init(modelContext: ModelContext, artwork: ArtworkStore) {
+    init(modelContext: ModelContext, artwork: ArtworkStore, files: LibraryFiles) {
         self.modelContext = modelContext
         self.artwork = artwork
-        self.worker = ImportWorker(artwork: artwork)
+        self.files = files
+        self.worker = ImportWorker(artwork: artwork, files: files)
         reload()
     }
 
@@ -152,9 +154,11 @@ final class LibraryService {
                     album: batch.singleAlbum ?? file.album,
                     year: file.year, trackNumber: file.trackNumber, discNumber: file.discNumber,
                     duration: file.duration, fileSize: file.fileSize, fileExtension: file.fileExtension,
-                    filePath: file.path, bookmarkData: file.bookmark, artworkKey: file.artworkKey
+                    filePath: file.path, libraryFileName: file.libraryFileName, artworkKey: file.artworkKey
                 )
                 if batch.skipDuplicates, knownPaths.contains(track.filePath) || knownKeys.contains(track.contentKey) {
+                    // The same recording under another name: don't keep a second copy of it.
+                    self.files.remove(file.libraryFileName)
                     session.setStatus(.skipped, at: base + offset)
                     return
                 }
@@ -235,16 +239,38 @@ final class LibraryService {
         revision += 1
     }
 
-    /// Called when a bookmark resolved as stale; the refreshed one keeps working.
-    func updateBookmark(forTrackWithID id: UUID, to data: Data) {
-        guard let track = tracksByID[id] else { return }
-        track.bookmarkData = data
+    /// Copies songs that an older version only pointed at into the library folder, so they no
+    /// longer depend on where the originals are. Songs whose original is already gone are left
+    /// as they are and tried again next launch.
+    func migrateLegacyTracks() async {
+        let legacy = tracks.filter { $0.libraryFileName == nil && !$0.bookmarkData.isEmpty }
+        guard !legacy.isEmpty else { return }
+        var changed = 0
+        for track in legacy {
+            let id = track.id
+            guard let fileName = await worker.copyIntoLibrary(bookmark: track.bookmarkData) else { continue }
+            // The song may have been removed from the library while its file was being copied.
+            guard let track = tracksByID[id] else {
+                files.remove(fileName)
+                continue
+            }
+            track.libraryFileName = fileName
+            track.bookmarkData = Data()
+            changed += 1
+            if changed.isMultiple(of: 25) { save() }
+        }
+        guard changed > 0 else { return }
         save()
+        revision += 1
+        log.info("Copied \(changed) older songs into the library")
     }
 
+    /// Takes songs out of the library and deletes Spindle's copies of them. The originals the
+    /// songs were imported from are never touched.
     func remove(_ tracksToRemove: [Track]) {
         guard !tracksToRemove.isEmpty else { return }
         let ids = Set(tracksToRemove.map(\.id))
+        let storedNames = tracksToRemove.compactMap(\.libraryFileName)
         for track in tracksToRemove { modelContext.delete(track) }
         for playlist in playlists where playlist.trackIDs.contains(where: ids.contains) {
             playlist.trackIDs.removeAll(where: ids.contains)
@@ -253,6 +279,7 @@ final class LibraryService {
         tracks.removeAll { ids.contains($0.id) }
         for id in ids { tracksByID[id] = nil }
         save()
+        for name in storedNames { files.remove(name) }
         revision += 1
     }
 
